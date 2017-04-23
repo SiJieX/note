@@ -1,0 +1,261 @@
+javascript概述：
+	基于对象和事件驱动的脚本语言，主要应用在客户端
+		JS代码写好后，需要外界触发后，方可运行，例如：单击事件，定时执行
+	特点：
+		1.交互性
+		2.安全性:不允许直接访问本地硬盘
+		3.跨平台性：只要可以解析js的浏览器就可以执行
+js与java的不同：
+	1.js是基于对象(在内存中全是对象)，java是面向对象
+	2.js只需解释就可以执行，java需要先编译成字节码文件，在执行
+	    每次运行JS代码时，得需要将原代码一行一行的解释执行，相对编译型语言（例如：Java、C++）执行速度相对较慢
+	3.js是弱类型语言（没有严格的数据类型），java是强类型语言（没一种数据类型都有严格的划分，都会在内存中划分空间）
+js与html的结合方式：
+	1.将javascript代码封装到标签中
+		<script type = "text/javascript">(代码)</script>
+	2.将代码封装到js文件中，并通过script标签中的src属性引入
+		<script type = "text/javascript" src="demo.js"></script>
+		注意：如果<script>标签中使用src属性，那么该标签中的代码不会被执行，因此通常导入js文件都是用单独的<script>标签类完成
+语法：
+	1：关键字
+	2：标识符
+	3：注释 
+	4：变量：
+		使用关键字var
+			1.js是弱类型的语言，没有严格的数据类型
+			2.js是非严谨的语言，可以不写分号（同一行时必须写分号），也可以不写var
+			3.单引号和双引号是一样的
+		注意：未定义类型：undefined:定义了变量名没有赋值
+		typeof(数据)：判断数据是什么类型
+		全局变量和局部变量：
+			全局变量：在同一个页面的所有脚本片段定义的变量
+			局部变量：在函数里定义的变量
+	5：运算符：
+		1.算数运算符：
+			+，-，*，/，%，++，--
+			注意:
+				1.不同于java整数的相除会准确运算，小数的运算结果如果是整数会省略小数位
+				2."12"+1结果为：121；"12"-1结果为：11；true+1结果为2；
+				3.js中false和null参加运算时就是0；非0，非null就是true；true参加运算时默认用1表示
+				4.alert("a"-1);结果为NaN
+		2.赋值运算符：
+			=,+=,-=,*=,/=,%=
+		3.比较运算符
+			>,< ,>=, <= ,==(只比较两个变量的值，不管类型) ,!= ,===（比较值和变量的类型） ,!==
+		4.逻辑运算符(连接两个boolean型变量)：
+			!，&&，||
+			注意：!必须写成英文状态;!0为true;!7为false;
+		5.位运算符：
+		6.三元运算符：
+			？ ：
+	6：语句
+		1.顺序结构：
+		2.判断结构：
+			if语句
+			注意：赋值运算在js中可以作为判断条件，java中不可以，因此建议将可以将常量写在左边
+				var a=3 ;
+				if(4==a)
+		3.选择结构：
+			var a;
+			swtch(a)
+				case "":
+				语句
+				break;
+				case "":
+				语句
+				break;
+				case "":
+				语句
+				break;
+				default:
+				break;
+				
+		4.循环结构:
+			while(){}
+				注意：不能写成while();{}不会报错
+			if(var a =0;a<7;a++){}：
+				注意：var不能写成int
+		5.其他语句：
+			break:跳出当前循环
+			continue:跳出本次循环
+	7：函数
+		通过指定的关键字来定义：
+		function 函数名（参数列表）{//参数列表不定义类型
+			函数体；
+			return 返回值;//如果没有具体的返回值，可以不写return语句
+		}
+		函数调用：
+			函数名（实参）；
+			注意：
+				1.调用函数时可以不传入实参，会显示undefined,建议有几个参数就传递几个实参
+				2.函数中有一个数组在对传入的参数进行存储，这个数组就是arguments
+				3.如果调用函数是没有写括号，该函数名就是函数对象的引用，因为在js中函数是一个对象。因此会打印出函数的字符串内容
+				4.js中函数里和以嵌套函数
+		动态函数：
+			var add = new Function("参数列表字符串内容","函数体字符串内容");注意：都要用引号括起来
+			调用：add(参数)
+			参数列表和函数体可以通过字符串动态传入到函数内,不是很常用
+		匿名函数：
+			var add=function(){}
+			调用：add(参数)
+		with语句：为了简化对象调用
+			格式：with（对象）
+				{
+					在该区域中可以直接使用对象的内容，不需要写对象.
+				}
+		for in 语句：可以遍历数组和对象
+			格式：for(变量 in 要遍历的变量名){
+				
+			}
+	8：数组
+		js中定义数组的两种方式：
+			 1.var arr = [];var arr =[3,5,8];
+			 2.使用了javascript中的Array对象来完成定义的
+			 	var arr = new Array();
+			 	var arr = new Array(5);长度为5
+			 	var arr = new array(5,4,8);元素是5,4,8
+			 		注意：与java不同使用的是括号不是"[]"
+		特点： 1.长度是可变的
+			 2.元素的类型是任意的（建议存储同类型的数据）
+	9：对象
+		Object对象：提供JS所有对象的通用功能
+			toString():将对象用字符串表现形式输出，不同对象输出方式不同，数组是打印数组内容，函数是原样输出函数内容
+			valueOf():返回指定对象的原始值，不同的对象方法的定义不同与toString()方法差不多
+		String对象：
+			表现形式：var str = new String("abd");
+					var str = "abd";
+			属性：
+				length:字符串长度
+				prototype:原型
+					该类对象的一个描述，该描述中如果添加了新功能，那么该对象都会具备这些新功能
+					通过prototype就可以对对象的功能进行扩展
+						添加属性：String.prototype.属性名=属性值；
+						添加方法： 1.String.prototype.方法名=定义好的方法名；
+								2.String.prototype.方法名=function(){}匿名的方式，
+			方法：
+				strObj.charAt(index):返回指定索引位置处的字符。
+				strObj.lastIndexOf(substring[, startindex]):返回最后字符串的索引
+				toLowerCase():
+				toUpperCase():
+				sup():将 HTML 的 <SUP> 标识放置到 String 对象中的文本两端。
+				bold():把 HTML <B> 标记放置在 String 对象中的文本两端。
+				link():把一个有 HREF 属性的 HTML 锚点放置在 String 对象中的文本两端。
+				split:将一个字符串分割为子字符串，然后将结果作为字符串数组返回。 
+				objectname.toString([radix])：radix 可选项。将字符串转成多少进制
+		Array对象：数组对象
+			var arr = [];	var arr = new Array();	var arr = new Array(5); var arr = new Array(11,34,56);
+			二维数组：var arr =[[],[],[]];
+			属性：length
+			方法：concat 方法 (Array):返回一个新数组，这个新数组是由两个或更多数组组合而成的。
+				arrayObj.push([item1 [item2 [. . . [itemN ]]]]):将新元素添加到一个数组中，并返回数组的新长度值。如果是添加的元素是数组，会作为一个元素（成为了二维数组）
+				arrayObj.join(separator):返回字符串值，其中包含了连接到一起的数组的所有元素，元素由指定的分隔符分隔开来。
+				arrayObj.pop( ):移除数组中的最后一个元素并返回该元素。
+				arrayObj.shift( )：移除数组中的第一个元素并返回该元素。
+				arrayObj.reverse( )：返回一个元素顺序被反转的 Array 对象。
+				arrayObj.slice(start, [end]) ：返回一个数组的一段（切割数组）
+				arrayobj.sort(sortfunction) ：返回一个元素已经进行了排序的 Array 对象。
+					sortFunction 可选项。是用来确定元素顺序的函数的名称。如果这个参数被省略，那么元素将按照 ASCII 字符顺序进行升序排列 
+				arrayObj.splice(start, deleteCount, [item1[, item2[, . . . [,itemN]]]])
+					从一个数组中移除一个或多个元素，如果必要，在所移除元素的位置上插入新元素，返回所移除的元素。
+				arrayObj.unshift([item1[, item2 [, . . . [, itemN]]]]):将指定的元素插入数组开始位置并返回该数组。
+		Date对象：
+			dateObj = new Date()：获取当前时间
+			dateObj = new Date(dateVal)
+			dateObj = new Date(year, month, date[, hours[, minutes[, seconds[,ms]]]])
+			注意：月份要加一 
+			方法：
+				dateObj.toLocaleString()：日期和时间
+				objDate.toLocaleDateString()：只有日期
+				dateObj.getTime()：返回日期的毫秒值
+				dateObj.setTime(milliseconds)：将毫秒值转成日期对象
+				*Date.parse(dateVal)：将具备指定格式的字符串转成日期对象以毫秒值返回
+		Math对象：该对象中的方法都是静态的
+			方法：
+				Math.ceil(number)：返回大于等于其数字参数的最小整数。
+				Math.floor(number)：返回小于等于其数值参数的最大整数。
+				Math.round(number) ： 四舍五入
+				Math.pow(base, exponent) :返回底表达式的指定次幂。
+				Math.random():返回介于 0 和 1 之间的伪随机数。
+		进制间转换：
+			将指定进制格式的字符串转成十进制：
+				parseInt(numString, [radix])：radix为字符串的进制
+			将十进制转成其他进制：
+				使用Number对象的objectname.toString([radix])方法：radix要转的进制数
+		Global 对象：全局对象:所有全局方法集中在全局对象中，调用方法时不用写对象名.直接使用
+			方法： parseFloat(numString):返回由字符串转换得到的浮点数。 
+				 parseInt(numString, [radix]):返回由字符串转换得到的整数。
+				 	radix:可选项。在 2 和 36 之间的表示 numString 所保存数字的进制的值。
+				 		     如果没有提供，则前缀为 '0x' 的字符串被当作十六进制，
+				 		     前缀为 '0' 的字符串被当作八进制。
+				 		     所有其它字符串都被当作是十进制的。
+				 	注意： parseInt("abc")：返回 NaN。
+				 		 parseInt("12abc")：返回 12。
+				 isNaN(numValue):是数字返回false,不是数字返回true;
+		Location：地址对象
+		Window:对象
+			window.open(url):
+		document对象：
+			document.forms:返回的是form表单对象的数组 
+		自定义对象：
+			对象调用成员有两种方式：对象.属性名；对象["属性名"](注意引号)
+			在JS中，可以用函数来模拟面向对象中的描述
+			方式一：function 对象名（）{//相当于构造器
+						代码；
+				  }
+				  例如：
+				  function Person(name,age){
+						this.name=name;//this不能省略
+						this.age=age;
+						this.setName = function(name){//this不能省略
+							this.name = name;
+						}
+						this.getName = function(){
+							return this.name;
+						}
+						this.setAge = function(age){
+							this.age = age;
+						}
+						this.getAge = function(){
+							return this.age;
+						}
+				  } 
+				  	
+				    动态给对象添加属性：对象名.属性名=属性值；
+				    	例如：var p = new Person("小强", 34);
+				    		  p.sex="男";
+				    动态给对象添加方法：对象名.方法名=function(){代码}
+				    	例如：var p = new Person("小强", 34);
+				    			p.show=function(){
+				    				document.write("show");
+				    			}
+			方式二：通过键值对的方式：这种方式不用创建对象
+				格式 :var 对象名 = {
+					//属性定义：
+						"键1":值1,//注意用逗号隔开，当键是字符串时要用引号，数字时不用引号
+						"键2":值2,
+					//方法定义：
+						"方法名1":function(){},//注意逗号
+						"方法名2":function(){}
+				}
+				 
+				 	
+
+				 		
+
+				
+
+					
+				
+
+					
+				
+
+				
+
+				
+
+				
+
+				
+				
+			

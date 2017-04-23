@@ -1,0 +1,210 @@
+开发一个Servlet步骤
+	1.编写java类，继承HttpServlet类
+	2.重新doGet和doPost方法
+	3.Servlet程序交给tomcat服务器运行！！
+		3.1 servlet程序的class码拷贝到WEB-INF/classes目录
+		3.2 在web.xml文件中进行配置
+			<!-- servlet的配置 -->
+				  <servlet>
+				  	<!-- servlet的内部名称，自定义。尽量有意义 -->
+				  	<servlet-name>FirstServlet</servlet-name>
+				  	<!-- servlet的类全名： 包名+简单类名 -->
+				  	<servlet-class>gz.itcast.a_servlet.FirstServlet</servlet-class>
+				  </servlet>
+				  <!-- servlet的映射配置 -->
+				  <servlet-mapping>
+				  	<!-- servlet的内部名称，一定要和上面的内部名称保持一致！！ -->
+				  	<servlet-name>FirstServlet</servlet-name>
+				  	<!-- servlet的映射路径（访问servlet的名称） -->
+				  	<url-pattern>/first</url-pattern>
+				  </servlet-mapping>
+	4.运行：Servlet必须交给tomcat服务器来运行
+		在浏览器输入  http://localhost:8080/day10/first  
+Servlet的映射路径：
+	<servlet-mapping>
+	  	<!-- servlet的内部名称，一定要和上面的内部名称保持一致！！ -->
+	  	<servlet-name>FirstServlet</servlet-name>
+	  	<!-- servlet的映射路径（访问servlet的名称） -->
+	  	<url-pattern>/first</url-pattern>
+  	</servlet-mapping>
+  	              	url-pattern：              		浏览器输入：
+		精确匹配              		 /first                 http://localhost:8080/day10/first
+						 /itcast/demo1          http://localhost:8080/day10/itcast/demo1
+
+		模糊匹配             		 /*                     http://localhost:8080/day10/任意路径(一般不使用，这样就不能找到项目里的静态资源）																	静态文件)
+						 /itcast/*              http://localhost:8080/day10/itcast/任意路径
+						 *.后缀名             			http://localhost:8080/day10/任意路径.do
+						 *.do
+						 *.action
+						 *.html(伪静态)
+		注意：
+		1.url-pattern要么以 / 开头，要么以*开头。  例如， itcast是非法路径。
+		2.不能同时使用两种模糊匹配，例如 /itcast/*.do是非法路径
+		3.当要输入的URL有多个servlet同时被匹配的情况下：
+			3.1 精确匹配优先。（长的最像优先被匹配）
+			3.2 以后缀名结尾的模糊url-pattern优先级最低
+		servlet缺省路径：
+			servlet的缺省路径（<url-pattern>/</url-pattern>）是在tomcat服务器内置的一个路径。
+			该路径对应的是一个DefaultServlet（缺省Servlet）。这个缺省的Servlet的作用是用于解析web应用的静态资源文件
+			tomcat服务器读取静态资源的步骤：
+				URL输入http://localhost:8080/day10/index.html 
+					1.到当前day10应用下的web.xml文件查找是否有匹配的url-pattern。
+					2.如果没有匹配的url-pattern，则交给tomcat的内置的DefaultServlet处理
+					3.DefaultServlet程序到day10应用的根目录下查找是存在一个名称为index.html的静态文件。
+					4.如果找到该文件，则读取该文件内容，返回给浏览器。
+					5.如果找不到该文件，则返回404错误页面。
+				结论： 先找动态资源，再找静态资源,因此不能配置成<url-pattern>/*</url-pattern>
+Sevlet的生命周期（重点）
+	Servlet的生命周期： servlet类对象什么时候创建，什么时候调用什么方法，什么时候销毁。
+		Servlet程序的生命周期是由tomcat服务器控制的
+	Servlet重要的四个生命周期方法
+		构造方法： 创建servlet对象的时候调用。默认情况下，第一次访问servlet的时候创建servlet对象	
+			          只调用1次。证明servlet对象在tomcat是单实例的。
+		init方法： 创建完servlet对象的时候调用。只调用1次。
+		service方法： 每次发出请求时调用。调用n次。
+		destroy方法：只调用1次， 销毁servlet对象的时候调用，停止服务器或者重新部署web应用时销毁servlet对象
+	伪代码演示servlet的生命周期:访问URL：  http://localhost:8080/day10/first
+		前提：tomcat服务器启动时，首先加载webapps中的每个web应用的web.xml配置文件。	
+		1.localhost： 到本地的hosts文件中查找是否存在该域名对应的IP地址127.0.0.1
+		2.端口8080：找到tomcat服务器
+		3./day10 ：在tomcat的webapps目录下找 day10的目录
+		4./first：资源名称
+				1）在day10的web.xml中查找是否有匹配的url-pattern的内容（/first）
+				2）如果找到匹配的url-pattern,则使用当前servlet-name的名称到web.xml文件中查询是否相同名称的servlet配置
+				3）如果找到，则取出对应的servlet配置信息中的servlet-class内容：
+						字符串： gz.itcast.a_servlet.FirstServlet
+		5.通过映射找到到servlet-class的内容，字符串： gz.itcast.a_servlet.FirstServlet
+			1.通过反射构造FirstServlet对象
+				1.1 得到字节码对象
+					Class clazz = class.forName("gz.itcast.a_servlet.FirstServlet");
+				1.2 调用无参数的构造方法来构造对象
+					Object obj = clazz.newInstance();     ---1.servlet的构造方法被调用
+			2.创建ServletConfig对象，通过反射调用init方法
+				3.1 得到方法对象
+					Method m = clazz.getDeclareMethod("init",ServletConfig.class);
+				3.2 调用方法
+					m.invoke(obj,config);             	  ---2.servlet的init方法被调用
+					注意：有参的init方法源码中已经调用了无参的init方法
+			3.创建HttpServletRequest，HttpServletResponse对象，通过反射调用service方法
+				3.1 得到方法对象
+					Methodm m =clazz.getDeclareMethod("service",HttpServletRequest.class,HttpServletResponse.class);
+				3.2 调用方法
+					m.invoke(obj,request,response);       ---3.servlet的service方法被调用
+			4.当tomcat服务器停止或web应用重新部署，通过反射调用destroy方法
+				4.1 得到方法对象
+					Method m = clazz.getDeclareMethod("destroy",null);
+				4.2 调用方法
+					m.invoke(obj,null);                   ---4.servlet的destroy方法被调用
+Servlet的自动加载
+	默认情况下，第一次访问servlet的时候创建servlet对象。如果servlet的构造方法或init方法中执行了比较多的逻辑代码，
+	那么导致用户第一次访问sevrlet的时候比较慢。改变servlet创建对象的时机： 提前到加载web应用的时候
+	步骤：在servlet的配置信息中，加上一个<load-on-startup>即可
+		<servlet>
+		    <servlet-name>LifeDemo</servlet-name>
+		    <servlet-class>gz.itcast.c_life.LifeDemo</servlet-class>
+		    <!-- 让servlet对象自动加载 -->
+		    <load-on-startup>1</load-on-startup>  注意： 整数值越大，创建优先级越低！！
+  		</servlet>
+Servlet的多线程并发问题
+	注意： servlet对象在tomcat服务器是单实例多线程的。
+		因为servlet是多线程的，所以当多个servlet的线程同时访问了servlet的共享数据，如成员变量，可能会引发线程安全问题。
+		解决办法：
+			1.把使用到共享数据的代码块进行同步（使用synchronized关键字进行同步）
+			2.建议在servlet类中尽量不要使用成员变量。如果确实要使用成员，必须同步。
+			     而且尽量缩小同步代码块的范围。（哪里使用到了成员变量，就同步哪里！！），
+			     以避免因为同步而导致并发效率降低。
+		Servlet学习：
+			HttpServletRequest  请求对象：获取请求信息
+			HttpServletResponse 响应对象： 设置响应对象
+			ServletConfig对象    servlet配置对象(只封装了servlet的配置数据)
+			ServletContext对象； servlet的上下文对象(封装了web.xml的所有数据)
+ServletConfig对象
+	作用：主要是用于加载servlet的初始化参数。在一个web应用可以存在多个ServletConfig对象（一个Servlet对应一个ServletConfig对象）
+	创建时机： 在创建完servlet对象之后，在调用init方法之前创建。
+	得到对象： 直接从有参数的init方法中得到(覆盖init方法)
+			或者通过this.getServletConfig()获得对象，但是必须执行了父类的init的有参方法
+	servlet的初始化参数配置:
+		<servlet>
+		    <servlet-name>ConfigDemo</servlet-name>
+		    <servlet-class>gz.itcast.f_config.ConfigDemo</servlet-class>
+		    <!-- 初始参数： 这些参数会在加载web应用的时候，封装到ServletConfig对象中(相当于properties文件的作用，把地址保存到init-param中) -->
+		    <init-param>
+		    	<param-name>path</param-name>
+		    	<param-value>e:/b.txt</param-value>
+		    </init-param>
+  		</servlet>
+  		注意： servlet的参数只能由当前的这个sevlet获取
+  	ServletConfig的核心API：
+		java.lang.String getInitParameter(java.lang.String name)：根据参数名获取参数值
+		java.util.Enumeration getInitParameterNames()：获取所有参数
+		ServletContext getServletContext()：得到servlet上下文对象
+		java.lang.String getServletName()：得到servlet的名称(就是该servlet的类名，不包括包名)
+ServletContext对象：（整个web.xml的信息）
+	ServletContext对象 ,叫做Servlet的上下文对象。表示一个当前的web应用环境
+	一个web应用中只有一个ServletContext对象。
+	创建时机：加载web应用时创建ServletContext对象。
+	得到对象： 从ServletConfig对象的getServletContext方法得到
+			或者通过this.getServletContext()获得对象，但是必须执行了父类的init的有参方法
+	初始化参数配置：
+		初始化参数在<web-app>标签里面<servlet>标签外面的<context-param>标签
+			<context-param>
+			    <param-name>name</param-name>
+			    <param-value>熊思杰</param-value>
+			</context-param>
+		web应用参数可以让当前web应用的所有servlet获取
+	ServletContext对象的核心API
+		得到当前web应用的路径（当前web项目名称）
+			java.lang.String getContextPath()   --得到当前web应用的路径（当前web项目名称）
+			或者：req.getContextPath();
+			注意：在eclipse中更换项目名，不会在tomcat中更改，因此最好用该方法得到类名
+				用在请求重定向的资源名称中
+					注意：web应用改名称后，要重新设置应用名
+		获得webxml中<context-param>数据有关方法：
+			java.lang.String getInitParameter(java.lang.String name)：根据参数名获取参数值
+			java.util.Enumeration getInitParameterNames()
+		域对象：
+			作用是用于保存数据，获取数据。可以在不同的动态资源之间共享数据（不会再web.xml中存储）
+			servlet间传数据有两种方式（只能传递字符串数据）：
+				1.response.sendRedirect("/Servlet2?name=eric") 
+				  String request.getParameter("name"); 
+				2.同过域对象（可以共享任何数据）：
+					所有域对象（作用范围不同）：
+						HttpServletRequet 域对象
+						ServletContext域对象：作用范围在整个web应用中有效
+						HttpSession 域对象
+						PageContext域对象
+		ServletContext域对象有关的方法 ：
+			void setAttribute(java.lang.String name, java.lang.Object object) --域对象有关的方法
+			java.lang.Object getAttribute(java.lang.String name)
+			void removeAttribute(java.lang.String name)
+		转发（类似于重定向）
+			第一种方式：	  
+				RequestDispatcher dispatcher = ServletConfig/this.getServletContext().getRequestDispatcher("");
+				dispatcher.forward(req, resp);
+			第二种方式：
+				RequestDispatcher dispatcher = req.getRequestDispatcher("");
+				dispatcher.forward(req, resp);
+			转发与重定向的区别：
+				1）转发
+					 a）地址栏不会改变
+					 b）转发只能转发到当前web应用内的资源
+					 c）在转发过程中，可以把数据保存到request域对象中
+				2）重定向			
+					 a）地址栏会改变，变成重定向到地址。
+					 b）重定向可以跳转到当前web应用，或其他web应用，甚至是外部域名网站。
+					 c）不能在重定向的过程，把数据保存到request中。
+			结论： 如果要使用request域对象进行数据共享，只能用转发技术
+		得到web应用的资源文件
+			资源文件的绝对路径：	
+				java.lang.String getRealPath(String path):path写项目名称后的路径  
+			得到资源文件，返回输入流:
+				java.io.InputStream getResourceAsStream(java.lang.String path)
+			注意：
+				在web项目下不要这样写路径，因为"." 表示在tomcat/bin目录下
+					File file = new File("./src/db.properties")
+				"."表示相对路径中的当前路径，相当于java命令运行的目录
+			写路径原则：
+				给服务器使用：/表示在当前web应用的根目录下（转发）
+				给浏览器使用：/表示在webapps的根目录（超链接，请求重定向，表单提交地址）
+					
+				   

@@ -1,0 +1,55 @@
+监听器： 主要是用来监听特定对象的创建或销毁、属性的变化的！是一个实现特定接口的普通java类！
+	对象：
+		自己创建自己用 (不用监听)
+		别人创建自己用 （需要监听）
+Servlet中需要监听的对象
+	request / session / servletContext
+	分别对应的是request监听器、session相关监听器、servletContext监听器
+监听器(listener)
+	1.监听对象创建/销毁的监听器接口
+		Interface ServletRequestListener     监听request对象的创建或销毁（浏览器访问就创建request对象，访问完就销毁）
+		Interface HttpSessionListener        监听session对象的创建或销毁（通过request对象获取时传入true就创建，默认30分钟不使用就销毁）
+		Interface ServletContextListener     监听servletContext对象的创建或销毁（服务器启动就创建context对象，服务器关闭就销毁）
+	2,监听对象属性的变化
+		Interface ServletRequestAttributeListener 监听request对象属性变化: 添加、移除、修改
+		Interface HttpSessionAttributeListener    监听session对象属性变化: 添加、移除、修改
+		Interface ServletContextAttributeListener  监听servletContext对象属性变化
+	3.session相关监听器
+		Interface HttpSessionBindingListener   监听对象绑定到session上的事件	
+    	Interface HttpSessionActivationListener(了解) 监听session序列化及反序列化的事件
+生命周期监听器
+	生命周期监听器： 监听对象的创建、销毁的过程！
+	监听器开发步骤：
+		1.写一个普通java类，实现相关接口
+			实现接口方法:
+				requestDestroyed(ServletRequestEvent sre){}
+				requestInitialized(ServletRequestEvent sre){}
+			事件源对象ServletRequestEvent可以获取相对应的监听对象
+		2.配置(web.xml):
+			 <listener>
+			  	<listener-class>listenerDemo.RequestListenerDemo</listener-class>
+			 </listener>
+属性监听器
+	监听:request/session/servletContext对象属性的变化！
+session绑定相关监听器：
+	Interface HttpSessionBindingListener 监听对象绑定到session上的事件
+	步骤：
+		1.对象实现接口； 再把对象绑定/解除绑定到session上就会触发监听代码。
+			public void valueBound(HttpSessionBindingEvent event) {}:该对象被添加进session时调用
+			public void valueUnbound(HttpSessionBindingEvent event) {}：该对象被移除session时调用
+	作用：
+		(上线提醒！)
+	注意：
+		不用在web.xml配置，因为监听的对象是自己创建的对象，不是服务器对象！
+案例
+	需求：做一个在线列表提醒的功能!
+     	 用户-- 登陆
+	            显示登陆信息，列表展示。(list.jsp)
+		  显示在线用户列表        (list.jsp)
+		  列表点击进入“在线列表页面”   onlineuser.jsp
+	实现思路：
+		1.先增加退出功能；  再把session活跃时间1min;
+		2.写监听器，监听servletContext对象的创建： 初始化集合(onlineuserlist)
+		3.登陆功能： 用户登陆时候，把数据保存到servletContext中
+		4.List.jsp  增加超链接， 点击时候提交直接跳转到online.jsp
+		5.写监听器： 监听session销毁，把当前登陆用户从onlineuserlist移除！

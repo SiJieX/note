@@ -1,0 +1,154 @@
+基本数据对象包装类：
+		为了方便操作基本数据类型值，将其封装成了对象，在对象中定义了属性和行为丰富了该类的操作
+		用于描述该对象的类就称为基本数据类型对象的包装类。
+对应关系：
+	byte 		Byte
+	short		Short
+	int			Integer
+	long		Long
+	float		Float
+	double  	Double
+	char		Character
+	boolean		Boolean	
+
+数字格式的字符串转成基本数据类型的方法：
+	1：将该字符串封装成了Integer对象，并调用对象的方法intValue();
+	2：使用包装类中的静态方法 xxx parseXxx("xxx类型的字符串");
+		int parseInt("intstring");
+		long parseLong("longstring");
+		boolean parseBoolean("booleanstring");
+		Character类没有此方法，可以用String类的 char[] toCharArray()方法
+将基本类型转成字符串：
+	1：用String类中的静态方法static String valueOf(基本类型数值)
+	1：基本数据类型中的静态方法：static String toString(int i) ：将i转成字符串 
+	2：int+"";
+十进制转其它进制（Integer的静态方法）：
+	1.static String toBinaryString(int i) 转二进制
+ 	2.static String toHexString(int i) 转16进制
+ 	3.static String toOctalString(int i)  转8进制
+ 	4.static String toString(int i, int 多少进制)  
+ 其他进制转十进制（Integer的静态方法）：
+ 	static int parseInt(String s, int 字符串数字是多少进制)： 
+Integer之间的比较
+	 int compareTo(Integer anotherInteger) ：如果该 Integer 等于 Integer 参数，则返回 0 值；如果该 Integer 在数字上小于 Integer 参数，则返回小于 0 的值；如果 Integer 在数字上大于 Integer 参数，则返回大于 0 的值（有符号的比较）。
+	 boolean equals(Object obj) 
+	 	注意：必须封装成Integer对象
+自动装箱和拆箱：
+	在jdk1.5版本后，对基本数据类型对象包装类进行升级。在升级中，使用基本数据类型对象包装类可以像使用基本数据类型一样，进行运算。
+		Integer i = new Integer(4); //1.5版本之前的写法；
+		Integer i = 4; //自动装箱，1.5版本后的写法（赋值为null时如果参与运算会抛出空指针异常）
+	注意： Integer c = 127;
+		 Integer d = 127;
+	 	 System.out.println(c == d); //true
+			在装箱时，如果数值在byte范围之内，那么数值相同，不会产生新的对象，也就是说多个数值相同的引用指向的是同一个对象。
+System:
+	不能不实例化
+		静态属性：
+			static InputStream in ：“标准”输入流。 			
+		  	static PrintStream out ：“标准”输出流。
+		静态方法：
+			static long currentTimeMillis() ：返回以毫秒为单位的当前时间(以1970 年 1 月 1 日午夜作为基准)。
+			static Properties getProperties() :确定当前的系统属性,返回一个集合Properties（存储的都是String类型的键值对信息）
+			static String getProperty(String key) :通过键获得系统值
+				System.getProperty("line.separator"):获取不同系统的换行符
+			static String setProperty(String key, String value) :设置值（设置后这些值是全局的在所有java程序中不会改变）
+				关掉悬停后,需要时按F2显示
+Runtime类：
+	不能创建，但是有非静态方法，那么肯定有一个获得该对象的方法（单例）
+	方法：
+		static Runtime getRuntime() 获得Runtime对象
+		public Process exec(String command)throws IOException：执行设置了classpath的引用程序 
+			获得Process对象后调用destroy() 方法，可以杀掉通过其开启的进程
+		public void exit(int status):status为零时关闭java虚拟机
+Math类：
+	全是静态方法
+	public final class Math：不能被继承
+	属性：
+		static double PI  ：
+	方法：
+		static double/... abs(double a/...) ：获得绝对值
+		static double ceil(double a) ：返回大于参数的最小整数
+		static double floor(double a)：返回小于参数的最大整数  
+		static int round(float a) ：返回四舍五入的整数
+		static double/int/float/long max(double/int/float/long a, double/int/float/long b):返回大值 
+		static double/int/float/long min(double/int/float/long a, double/int/float/long b):返回小值 
+		static double pow(double a, double b)：a的b次方
+		static double random()：返回【0-1)的随机数 
+Date类:
+	日期类
+	构造方法：
+		Date()： 	打印返回的对象是当前日期的字符串形式(Tue Mar 21 17:37:26 CST 2017)
+		Date(long date)： 将指定的毫秒值封装成Date对象（只是一个瞬间）
+	方法：
+		 void setTime(long time)  ： 设置此 Date 对象，以表示 1970 年 1 月 1 日 00:00:00 GMT 以后 time 毫秒的时间点。
+		 							这种设置方式比起构造是传入值的方式，可以通过Date对象的方法对该日期中的各个字段（年月日等）进行操作
+		 long getTime(long time)  ：  返回自 1970 年 1 月 1 日 00:00:00 GMT 以来此 Date 对象表示的毫秒数。
+		 boolean after(Date when) :测试此日期是否在指定日期之后。
+		 boolean before(Date when) :测试此日期是否在指定日期之前。
+DateFormat格式化日期对象：
+	public abstract class DateFormat extends Format
+	构造方法：
+		protected  DateFormat() 给子类创建对象用的
+	方法：
+		静态工厂方法：专门用于创建对象的方法
+		static DateFormat getDateInstance()：获得DateFormat对象 (新创建的SimpleDateFormat对象) 
+		static DateFormat getDateTimeInstance(int dateStyle, int timeStyle) :获取日期/时间格式器，该格式器具有默认语言环境的给定日期和时间格式化风格。
+		static DateFormat getDateInstance(int style) :指定样式(DateFormat.FULL.....)
+		String format(Date date) ：将一个 Date 格式化为日期/时间字符串（默认样式2017-3-21）
+		Date parse(String source) :从给定字符串的开始解析文本，以生成一个日期。
+ 
+其子类：
+	SimpleDateFormat
+	构造方法：
+		SimpleDateFormat() ：
+		SimpleDateFormat(String pattern) ：查表给定格式格式化
+Calendar类：
+	以键值对的形式，封装日期的各种信息
+	方法：
+		static Calendar getInstance() ：获得该对象
+		int get(int field)  :返回给定日历字段的值
+其子类：
+	GregorianCalendar 
+ 
+		
+		
+		
+ 	 
+ 
+	
+
+	
+ 
+ 
+ 
+ 
+ 
+ 	
+ 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

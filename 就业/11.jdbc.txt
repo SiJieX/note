@@ -1,0 +1,131 @@
+jdbc入门:Java Data Base Connectivity
+ 	使用java代码（程序）发送sql语句的技术，就是jdbc技术
+ 	java提供了一套连接数据库的接口，由不同的数据库厂商，来实现这些接口就是驱动程序
+	之前操作数据
+		1）通过mysql的客户端工具，登录数据库服务器  （mysql -u root -p 密码）
+		2）编写sql语句
+		3）发送sql语句到数据库服务器执行
+	使用jdbc发送sql前提
+		登录数据库服务器（连接数据库服务器）
+		协议:jdbc:mysql:
+		数据库的IP地址 ：localhost
+		端口：3306
+		数据库用户名
+		密码
+		url:jdbc:mysql://localhost:3306/需要连接的数据库
+	连接mysql数据库的步骤：
+		第一种方式：
+			1.导入mysql的驱动jar包
+			2.创建驱动程序类对象
+				Driver driver = new com.mysql.jdbc.Driver()
+			3.设置用户名和密码
+				Properties props = new Properties();
+				props.setProperty("user", user);
+				props.setProperty("password", password);
+			4.连接数据库，返回连接对象
+				Connection conn = driver.connect(url, props);
+		第二种方式：
+			1.导入mysql的驱动jar包
+			2.创建驱动程序类对象
+				Driver driver = new com.mysql.jdbc.Driver()
+			3.注册驱动程序(可以注册多个驱动程序，通过url就能知道是哪个数据库厂商)
+				DriverManager.registerDriver(driver);(静态方法)
+			4.连接到具体的数据库
+				Connection conn = DriverManager.getConnection(url, user, password);
+		第三种方式（推荐使用）：
+			com.mysql.jdbc.Driver类有一个静态代码块 （类加载就执行）
+				static{
+					DriverManager.registerDriver(new driver());
+				}
+				因此可以通过获得字节码文件就注册了mysql的驱动程序
+			1.导入mysql的驱动jar包
+			2.通过得到字节码对象来注册mysql的驱动程序
+				Class.forName("com.mysql.jdbc.Driver");
+			3.连接到具体的数据库
+				Connection conn = DriverManager.getConnection(url, user, password);
+JDBC接口核心的API
+	java.sql.*和  javax.sql.*
+		|- Driver接口： 表示java驱动程序接口。所有的具体的数据库厂商要来实现此接口。
+			|- connect(url, properties):  连接数据库的方法。
+				url: 连接数据库的URL 
+				URL语法： jdbc协议:数据库子协议://主机:端口/数据库
+				user： 数据库的用户名
+				password： 数据库用户密码
+		|- DriverManager类： 驱动管理器类，用于管理所有注册的驱动程序
+			|-registerDriver(driver)  : 注册驱动类对象(静态方法)
+			|-Connection getConnection(url,user,password); 获取连接对象（静态方法）
+		|- Connection接口(需要关闭)： 表示java程序和数据库的连接对象。
+			|- Statement createStatement() ： 创建Statement对象
+			|- PreparedStatement prepareStatement(String sql)  创建PreparedStatement对象
+			|- PreparedStatement prepareStatement(String sql, PreparedStatement.RETURN_GENERATED_KEYS):标记获取自增长
+			|- CallableStatement prepareCall(String sql) 创建CallableStatement对象
+			|- void setAutoCommit(boolean autoCommit) ;  设置事务是否自动提交, 如果设置为false，表示手动提交事务(默认为true)。
+			|- void commit():	手动提交事务
+			|- void rollback():回滚（出现异常时候，所有已经执行成功的）
+			|- Savepoint setSavepoint(); 设置事务回滚点
+			|- void rollback(Savepoint s):回滚到事务点
+		|- Statement(需要关闭)接口： 用于执行静态的sql语句
+						|- int executeUpdate(String sql)  ： 执行静态的更新sql语句（DDL，DML）
+						|- ResultSet executeString sql)  ：执行的静态的查询sql语句（DQL）
+						|-void addBatch(String sql)：添加批处理
+						|-int[] executeBatch()：执行批处理
+						|-void clearBatch()：清空批处理（执行了批量处理后，要清空后，再添加批处理）
+			|-PreparedStatement接口：用于执行预编译sql语句
+					|- int executeUpdate() ： 执行预编译的更新sql语句（DDL，DML）
+					|- ResultSet executeQuery()  ： 执行预编译的查询sql语句（DQL）
+					|- void setXX(int parameterIndex, XX x) 
+						parameterIndex：表示第几个占位符，从1开始（占位符不能加引号）
+					|- ResultSet getGeneratedKeys()：获取自增长值
+				|-CallableStatement接口：用于执行存储过程的sql语句（call xxx）
+					|-ResultSet executeQuery() ： 调用存储过程的方法
+					|-void registerOutParameter(int parameterIndex, int sqlType):设置输出参数
+					| String getString(int parameterIndex):获取调用存储过程的输出结果  
+						parameterIndex：占位符的索引
+		|- ResultSet(需要关闭)接口：用于封装查询出来的数据
+			|-boolean next() ： 将光标移动到下一行
+			|-getXX(参数) : 获取列的值
+				参数可以使列的索引，从1开始
+				参数也可以是列名称，不区分大小写
+				注意：必须在调用了next方法后执行getXX方法，并且只能执行一句，因此应该写在if(rs.next()){}或者while(rs.next()){}代码块中
+		注意：
+			1.关流顺序：后打开的先关闭
+			2.注册好驱动后，导包不能到实现类的包，导接口的包（多态）
+			SQL类型						Jdbc对应方法				返回类型
+			BIT(1) bit(n)				getBoolean getBytes()	Boolean byte[]
+			TINYINT	 					getByte()				Byte
+			SMALLINT					getShort()				Short
+			Int							getInt()				Int
+			BIGINT						getLong()				Long
+			CHAR,VARCHAR,LONGVARCHAR	getString()				String
+			Text(clob)  Blob			getClob getBlob()		Clob  Blob
+			DATE(日期)					getDate()				java.sql.Date
+			TIME(时间)					getTime()				java.sql.Time
+			TIMESTAMP					getTimestamp()			java.sql.Timestamp
+			datetime(日期加时间)
+	PreparedStatement和Statment的区别：
+		1）语法不同：PreparedStatement可以使用预编译的sql，而Statment只能使用静态的sql
+		2）效率不同： PreparedStatement只会在缓冲区里产生该条预编译的sql,传入参数时只需将参数传入执行即可，Statment,每次都会参数sql语句
+		3）安全性不同： PreparedStatement可以有效防止sql注入(提高安全性)，而Statment不能防止sql注入。
+		推荐使用PreparedStatement
+			支持sql缓冲区的数据库：oracle，sql server
+			不支持缓冲区的数据库：mysql
+类路径：
+	InputStream is = 类名.class.getResourceAsStream("/");返回该目录的流对象
+	URL url = 类名.class.getResource("/");返回该目录的url对象
+		路径必须用url.getpath();url包括了文件协议
+		在java项目下表示bin目录的根目录
+		在web项目下，表示web-inf/classes的根目录
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+			
+			
+			

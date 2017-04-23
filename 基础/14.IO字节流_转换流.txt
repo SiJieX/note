@@ -1,0 +1,162 @@
+字节流：
+	InputStream：是表示字节输入流的所有类的超类。
+     |--- FileInputStream：从文件系统中的某个文件中获得输入字节。哪些文件可用取决于主机环境。FileInputStream 
+     		特殊方法：
+     		 	int available()：返回文件大小的字节数  
+     |--- FilterInputStream：包含其他一些输入流，它将这些流用作其基本数据源，它可以直接传输数据或提供一些额外的功能。
+        |--- BufferedInputStream：该类实现缓冲的输入流。
+        |--- Stream：
+     |--- ObjectInputStream：
+     |--- PipedInputStream：
+    OutputStream：此抽象类是表示输出字节流的所有类的超类。
+     |--- FileOutputStream：文件输出流是用于将数据写入 File 或 FileDescriptor 的输出流。
+     |--- FilterOutputStream：此类是过滤输出流的所有类的超类。
+        |--- BufferedOutputStream：该类实现缓冲的输出流。
+        |--- PrintStream：
+        |--- DataOutputStream：
+     |--- ObjectOutputStream：
+     |--- PipedOutputStream：
+注意：1.用于读取诸如图像数据之类的用字节流。
+		 要读取字符流，请考虑使用 FileReader
+	2.字符流不能复制不是文字的文件，因为媒体文件不一定有对应的码表
+键盘本身就是一个标准的输入设备
+对应java而言，对应这种输入设备都有对应的对象:
+	System:
+		成员变量：
+			static InputStream in :“标准”输入流。（返回的流对象一次只能读取一个字节，录入中文时一次读两个字节）
+注意：
+	1.用键盘录入时：输入数据后按下回车会再末尾加上"\r\n"
+	2.用键盘录入和输出的流不需要关闭，因为关闭后就在也不能用了，除非重启程序
+转换流：
+	InputStreamReader:
+		构造函数：
+			InputStreamReader(InputStream in) ：将字节流转换成读的字符流（默认使用GBK编码表）
+			InputStreamReader(InputStream in, Charset cs)：将字节流转换成读的字符流（给定码表）
+	OutputStreamWriter：
+		构造函数：
+			OutputStreamWriter(OutputStream out) ：将字节流转换成写的字符流（默认使用GBK编码表）
+			OutputStreamWriter(OutputStream out, Charset cs) 将字节流转换成写的字符流(给定编码表)
+File类：
+	成员属性：
+		static String separator :与系统有关的默认名称分隔符，为了方便，它被表示为一个字符串。
+		static String pathSeparator : 与系统有关的路径分隔符，为了方便，它被表示为一个字符串(盘符后的“：”)
+	构造方法：
+		File(String pathname) ：将一个已存在的，或者不存在的文件或者目录封装成对象
+		File(File parent, String child)：根据 parent 抽象路径名和 child 路径名字符串创建一个新 File 实例。
+		File(String parent, String child) ：根据 parent 路径名字符串和 child 路径名字符串创建一个新 File 实例。 
+	方法：
+		获取：
+			获取文件名称：
+				 String getName() 
+			获取文件路径：
+				File getAbsoluteFile()：绝对路径 
+				String getAbsolutePath() 绝对路径字符串形式
+				String getPath() ：相对路径
+			获取文件大小：
+				long length() 
+			获取文件修改时间：
+			long lastModified()
+			long getFreeSpace()：可用空间 
+			long getTotalSpace()  总空间
+			long getUsableSpace()  返回此抽象路径名指定的分区上可用于此虚拟机的字节数。（于可用空间大小相同）
+			static File[] listRoots() ：返回系统盘符的文件对象数组
+			String[] list() 返回所有文件夹和文件以及隐藏文件和隐藏文件夹（不包含系统目录与系统文件）
+				注意： 调用list方法的File对象中封装的必须是目录，否则会发生NullPointerException
+					   如果访问的是系统级目录也会发生空指针异常
+					  如果目录存在但是没有内容，会返回一个长度为零的数组
+			File[] listFiles() ：将所有文件夹和文件封装成file对象
+		    String[] list(FilenameFilter filter) ：返回符和给定过滤器的目录或文件
+		    		FilenameFilter接口 
+		    			方法：
+		    				boolean accept(File dir, String name) :  测试指定文件是否应该包含在某一文件夹中。
+		创建或删除：
+			boolean createNewFile() throws IOException  ：于输出流不同，文件不存在就创建，存在就不创建
+			static File createTempFile(String prefix, String suffix) ： 在默认临时文件目录中创建一个空文件，使用给定前缀和后缀生成其名称。
+			boolean delete() ：删除文件或目录（是从里往外删除的，如果目录里有文件直接删除目录，不会执行，如果有多级目录并且没有文件，会删除最后一个文件夹）
+			void deleteOnExit() ：在虚拟机终止时，删除文件
+			boolean mkdir() ：创建单级目录 
+			boolean mkdirs() ：创建多级目录 
+		判断：
+			boolean exists() 路径名表示的文件或目录是否存在
+			boolean isFile()  路径名表示的文件是否是一个标准文件（文件不存在会返回false，因此要先判断是否存在）
+			boolean isDirectory()  路径名表示的文件是否是一个目录（文件不存在会返回false，因此要先判断是否存在）
+		重命名：
+			 boolean renameTo(File dest) ：不在同一个目录是会剪切到更改后的目录并重命名
+递归：
+	函数自身直接或者间接调用到了自身
+	使用场合：
+		一个功能在被重复使用，并每次使用时，参与运算的结果和上一次调用有关
+注意：
+	1.递归一定要明确结束条件，否者容易栈溢出
+	2.如果递归方法里定义变量，每次调用方法时，都会开辟新栈区，创建新的局部变量
+	3.因为会不断开辟栈空间，只有运算完后才会出栈，因此要注意次数
+printStream类：
+	特点：
+		1.提供了打印方法可以对多种数据类型值进行打印。不用转换数据类型，并保持原有数据（int和字符转换）
+		2.它不抛IO异常
+		2.可以自动刷新
+		构造函数：
+			1.字符串路径
+			2.File对象
+			3.字节输出流
+printWriter类：
+	字符打印流
+	构造函数
+		1.字符串路径
+		2.File对象
+		3.字节输出流
+		4.字符输出流
+RandomAccessFile类：
+	不是IO体系的子类：
+		特点：
+			1：该对象即可读取，又可写入。
+			2：该对象中定义了一个大型的byte数组，通过定义指针来操作这个数组。
+			3：可以通过该对象的getFilePointer()获取指针的位置，通过seek()方法设置指针的位置。
+			4：该对象操作的源和目的必须是文件。 
+			5：其实该对象内部封装了字节读取流和字节写入流。
+				注意：实现随机访问，最好是数据有规律。
+					如果文件不存在就创建文件，如果文件存在，并且写入了数据，只覆盖修改的数据
+	构造方法：
+		RandomAccessFile(File file, String mode) 
+		RandomAccessFile(String name, String mode) 
+			mode值含意
+				"r" 以只读方式打开。调用结果对象的任何 write 方法都将导致抛出 IOException。  
+				"rw" 打开以便读取和写入。如果该文件尚不存在，则尝试创建该文件。  
+				"rws" 打开以便读取和写入，对于 "rw"，还要求对文件的内容或元数据的每个更新都同步写入到底层存储设备。  
+				"rwd"   打开以便读取和写入，对于 "rw"，还要求对文件内容的每个更新都同步写入到底层存储设备。
+ 	方法：
+ 		long getFilePointer() ：获得指针位置
+ 		void seek(long pos) ：设置指针位置
+管道流：
+	PipedInputStream
+	PipedOutputStream
+	管道流：管道读取流和管道写入流可以像管道一样对接上，管道读取流就可以读取管道写入流写入的数据。
+		注意：需要加入多线程技术，因为单线程，先执行read，会发生死锁，因为read方法是阻塞式的，没有数据的read方法会让线程等待。
+				public static void main(String[] args) throws IOException{
+					PipedInputStream pipin = new PipedInputStream();
+					PipedOutputStream pipout = new PipedOutputStream();
+					pipin.connect(pipout);
+					new Thread(new Input(pipin)).start();
+					new Thread(new Output(pipout)).start();
+				}
+ 操作基本数据类型的流：
+ 	DataInputStream
+ 	DataOutputStream
+操作内存中数据的流：
+	ByteArrayInputStream
+	ByteArrayOutputStream
+		该流关闭流是无效的，因为关闭流是因为调用了底层资源，而该流没有调用底层资源
+		
+	
+ 
+   
+	
+			
+			
+
+ 
+ 
+ 
+ 
+ 
+ 

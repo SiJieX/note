@@ -1,0 +1,191 @@
+Jsp基础
+	Jsp引入
+	Servlet的作用： 用java语言开发动态资源的技术
+	Jsp的作用：用java语言（+html语言）开发动态资源的技术 
+		Jsp就是servlet
+	Jsp的特点
+		1.jsp的运行必须交给tomcat服务器
+			tomcat的work目录： tomcat服务器存放jsp运行时的临时文件
+		2.jsp页面既可以写html代码，也可以写java代码。
+			（html页面不能写java代码 。而jsp页面可以写java代码）
+sp的执行过程 
+	访问http://localhost:8080/day12/01.hello.jsp 
+	1.访问到01.hello.jsp页面，tomcat扫描到jsp文件，在%tomcat%/work把jsp文件翻译成java源文件
+			(01.hello.jsp   ->   _01_hello_jsp.java) （翻译）
+	2.tomcat服务器把java源文件编译成class字节码文件 （编译）
+			（_01_hello_jsp.java  ->  _01_hello_jsp.class）
+	3.tomcat服务器构造_01_hello_jsp类对象
+	4.tomcat服务器调用_01_hello_jsp类里面方法，返回内容显示到浏览器。
+	第一次访问jsp：
+				走（1）（2）（3）（4）
+	第n次访问jsp：
+				走（4）
+	注意：
+		1.jsp文件修改了或jsp的临时文件被删除了，要重新走翻译（1）和编译（2）的过程
+jsp原理：
+	Jsp就是servlet
+	jsp翻译的java文件：
+		public final class _01_hello_jsp extends HttpJspBase
+    	implements JspSourceDependent {
+			HttpJspBase类：
+				public abstract class HttpJspBase extends HttpServlet implements HttpJspPage
+	结论： Jsp就是一个servlet程序！！！
+		servlet的技术可以用在jsp程序中
+		jsp的技术并不是全部适用于servlet程序
+	Servlet的生命周期：
+		1.构造方法（第1次访问）
+		2.init方法（第1次访问）
+		3.service方法
+		4.destroy方法		
+	Jsp的生命周期
+		1.翻译： jsp->java文件
+		2.编译： java文件->class文件（servlet程序）
+		3.构造方法（第1次访问）
+		4.init方法（第1次访问）：_jspInit()
+		5.service方法：_jspService()
+		6.destroy方法：_jspDestroy()
+Jsp语法
+	Jsp模板:
+		Java Server Pages
+		jsp页面中的html代码就是jsp的模板
+	Jsp表达式:
+		语法：<%=变量或表达式%>
+		作用： 向浏览器输出变量的值或表达式计算的结果
+		注意：		
+			1.表达式的原理就是翻译成out.print(“变量” );通过该方法向浏览器写出内容
+			2.表达式后面不需要带分号结束。
+	Jsp的脚本:
+		语法：<%java代码 %>
+		作用： 执行java代码	
+		注意：
+			1.原理把脚本中java代码原封不动拷贝到_jspService方法中执行。
+			2.脚本中不能声明方法
+	Jsp的声明:
+		语法：<%! 变量或方法 %>
+		作用： 声明jsp的变量或方法
+		注意:
+			1.变量翻译成成员变量，方法翻译成成员方法。
+			2.jsp声明中不能重复定义翻译好的一些方法
+	Jsp的注释
+		语法： <%!--  jsp注释  --%>
+		注意:
+			1.html的注释会被翻译和执行。而jsp的注释不能被翻译和执行,因此应该写jsp的注释
+Jsp的三大指令
+	include指令
+		作用： 在当前页面用于包含其他页面
+		语法： <%@include file="common/header.jsp"%>
+		注意：
+			1.原理是把被包含的页面（header.jsp）的内容翻译到包含页面(index.jsp)中,合并翻译成一个java源文件，再编译运行！！，这种包含叫静态包含（源码包含）
+			2.如果使用静态包含，被包含页面中不需要出现全局的html标签了（如html、head、body）
+	page指令（jsp文件开头处）
+		作用： 告诉tomcat服务器如何翻译jsp文件
+		<%@ page 
+			language="java"   --告诉服务器使用什么动态语言来翻译jsp文件
+			import="java.util.*" --告诉服务器java文件使用什么包,导入包，多个包之间用逗号分割
+			pageEncoding="utf-8"  --告诉服务器使用什么编码翻译jsp文件（成java文件）
+			contentType="text/html; charset=utf-8" 服务器发送浏览器的数据类型和内容编码
+				注意：在开发工具中，以后只需要设置pageEncoding即可解决中文乱码问题(会参考pageEncoding的设置)
+			errorPage="error.jsp":指定当前jsp页面的错误处理页面(给用户看)
+			isErrorPage="false":
+				指定当前页面是否为错误处理页面。false，不是错误处理页面，则不能使用	exception内置对象；
+				true，是错误处理页面，可以使用exception内置对象。(程序员用)
+					配置全局的错误处理页面(web.xml中)：
+					  <!-- 全局错误处理页面配置 -->
+						  <error-page>
+						  	<error-code>500</error-code>
+						  	<location>/common/500.jsp</location>
+						  </error-page>
+						  <error-page>
+						  	<error-code>404</error-code>
+						  	<location>/common/404.html</location>
+						  </error-page>
+			buffer="8kb":JspWriter的缓存区大小（默认为8kb）
+			session="true":
+				是否开启session功能。false，不能用session内置对象；true，可以使用session内置对象。
+			isELIgnored="false":是否忽略EL表达式。
+		%>
+Jsp的内置对象（重点）
+	在jsp开发中，会频繁使用到一些对象例如HttpSession,ServletContext,pageContext,HttpServletRequet
+	如果我们每次要使用这些对象都去创建或者获得这些对象就显示非常麻烦。所以Sun公司设计Jsp时，在jsp页面加载完毕之后就会自动帮
+	开发者创建好这些对象，而开发者只需要直接使用这些对象调用方法即可,这些创建好的对象就叫内置对象。
+	大内置对象
+		内置对象名         		 类型
+		request	   		HttpServletRequest
+		response   		HttpServletResponse
+		config        	ServletConfig
+		application     ServletContext
+		session         HttpSession
+		exception        Throwable
+		page            Object(this)(该jsp翻译成的类)
+		out             JspWriter
+		pageContext     PageContext 
+	out对象类型，JspWriter类，相当于带缓存的PrintWriter
+		PrintWriter： 
+			wrier(内容): 直接向浏览器写出内容。
+		JspWriter
+			writer(内容): 向jsp缓冲区写出内容
+			当满足以下条件之一，缓冲区内容写出：
+				1）缓冲区满了
+				2）刷新缓存区
+				3）关闭缓存区
+				4）执行完毕jsp页面
+	 pageContext对象
+		pageContext对象的类型是PageContext，叫jsp的上下文对象
+		作用： 1）可以获取其他八个内置对象
+				pageContext.get域对象的名称();
+			 2）本身是一个域对象
+			 	#保存数据
+					1）默认情况下，保存到page域
+						pageContext.setAttribute("name",Object);
+					2）可以向四个域对象保存数据
+						pageContext.setAttribute("name",Object,域范围常量)
+				#获取数据
+					1）默认情况下，从page域获取
+						pageContext.getAttribute("name")
+					2）可以从四个域中获取数据
+						pageContext.getAttribute("name",域范围常量)
+						域范围常量:
+							PageContext.PAGE_SCOPE：page域
+							PageContext.REQUEST_SCOPE：request域
+							PageContext..SESSION_SCOPE：session域
+							PageContext.APPLICATION_SCOPE：ServletContext域
+					3）自动在四个域中搜索数据
+							pageContext.findAttribute("name");
+							顺序： page域 -> request域 -> session域（要清空cookie）-> context域（application域）
+Jsp中的四个域对象总结：
+	四个域对象：
+		pageContext      page域（jsp特有的）				
+		request          request域
+		session          session域
+		application       context域
+	1）域对象作用：
+		保存数据  和 获取数据 ，用于数据共享。
+	2）域对象方法：
+		setAttribute("name",Object)： 保存数据
+		getAttribute("name")：  获取数据
+		removeAttribute("name")： 清除数据
+	3）域对象作用范围：
+		page域： 只能在当前jsp页面中使用（当前页面）
+		request域： 只能在同一个请求中使用（转发）
+		session域： 只能在同一个会话（session对象）中使用（私有的，默认不关闭浏览器）
+		context域： 只能在同一个web应用中使用（全局的）
+Jsp的最佳实践
+	Servlet技术： 开发动态资源。是一个java类，最擅长写java代码
+	jsp技术： 开发动态资源。通过java代码最擅长输出html代码。
+	各取所长：
+		在web项目中涉及到逻辑：
+			1）接收参数      servlet做
+			2）处理业务逻辑，返回结果    servlet做
+			3）显示数据到浏览器      jsp做
+			4）跳转到其他页面        servlet做
+	servlet+jsp模式
+		servlet:
+			1）接收参数
+			2）处理业务逻辑
+			3）把结果保存到域对象中
+			4）跳转到jsp页面
+		Jsp:
+			1）从域对象取出数据
+			2）把数据显示到浏览器
+
+

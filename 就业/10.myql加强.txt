@@ -1,0 +1,197 @@
+数据约束：对用户操作表的数据进行约束
+	 默认值：default
+		作用： 当用户对使用默认值的字段不插入值的时候，就使用默认值。
+		注意： 			
+			1）对默认值字段插入null是可以的
+			2）对默认值字段可以插入非null
+	非空:not null
+		作用： 限制字段必须赋值
+		注意：
+			1）非空字符必须赋值
+			2）非空字符不能赋null
+	 唯一: unique
+		作用： 字段的值不能重复
+		注意：
+			1）唯一字段可以插入null				
+			2）唯一字段可以插入多个null
+	 主键: primary key
+		作用： 非空+唯一
+		注意：			
+			1）通常情况下，每张表都会设置一个主键字段。用于标记表中的每条记录的唯一性。
+			2）建议不要选择表的包含业务含义的字段作为主键，建议给每张表独立设计一个非业务含义的id字段。
+	自增长:auto_increment
+		作用： 自动递增
+		id int(4) zerofill primary key auto_increment, 
+			自增长，从0开始,标题行就是第零行
+			zerofill 零填充，当int括号里写了数值，就代表是几位整数，当不够时在前面用零填充
+	外键约束：constraint emlyee_dept_fk foreign key(deptId) references dept(id)
+		作用：约束两张表的数据
+			解决数据冗余高问题： 独立出一张表		
+				例如： 员工表  和  部门表
+		问题出现：在插入员工表数据的时候，员工表的部门ID字段可以随便插入	
+		使用外键约束：约束插入员工表的部门ID字段值
+		解决办法： 在员工表的部门ID字段添加一个外键约束
+			部门表（主表）
+				CREATE TABLE dept(
+					id INT PRIMARY KEY,
+					deptName VARCHAR(20)
+				)
+			修改员工表（副表/从表）
+				CREATE TABLE employee(
+					id INT PRIMARY KEY,
+					empName VARCHAR(20),
+					deptId INT,-- 把部门名称改为部门ID
+					-- 声明一个外键约束
+					constraint emlyee_dept_fk foreign key(deptId) references dept(id)
+					        		外键名称                  外键                                            参考表(参考字段)
+				)
+		    注意：
+			1）被约束的表称为副表，约束别人的表称为主表，外键设置在副表上的！！！
+			2）主表的参考字段通常为主键！
+				只能是唯一的，不然副本不能引用为外键
+			3）添加数据： 先添加主表，再添加副表
+			4）修改数据： 先修改副表，再修改主表（只能修改副表中没有参考的数据）
+			5）删除数据： 先删除副表，再删除主表（只能删除副表中没有参考的数据）
+	 级联操作： 级联操作必须在外键基础上使用
+		问题： 当有了外键约束的时候，必须先修改或删除副表中的所有关联数据，才能修改或删除主表
+		但是，我们希望直接修改或删除主表数据，从而影响副表数据。可以使用级联操作实现
+		级联修改：on update cascade （主表修改后，副表的相关数据也会改变）
+		级联删除：on delete cascade（主表删除后，副表的相关数据也会改变）
+			constraint emlyee_dept_fk foreign key(deptId) references dept(id) on update cascade on delete cascade
+三大范式:建议设计的表尽量遵守三大范式。
+	第一范式： 要求表的每个字段必须是不可分割的独立单元
+		student:   		name              -- 违反第一范式
+				 	     张小名|狗娃	 				
+		sutdent    		name    old_name    --符合第一范式
+						张小名             狗娃
+	第二范式： 在第一范式的基础上，要求每张表只表达一个意思。表的每个字段都和表的主键有依赖(每个主键都必须有)。
+		employee（员工）: 员工编号  员工姓名 部门名称   订单名称   --违反第二范式
+		设计成两张表:员工表：员工编号  员工姓名 部门名称   
+				     订单表：  订单编号  订单名称             			--符合第二范式
+	第三范式： 在第二范式基础，要求每张表的主键之外的其他字段都只能和主键有直接决定依赖关系。
+		员工表：员工编号（主键） 员工姓名  部门编号  部门名 --符合第二范式，违反第三范式																	（数据冗余高）
+		员工表：员工编号（主键） 员工姓名  部门编号    --符合第三范式（降低数据冗余）
+		部门表：部门编号  部门名
+	注意：当表和表有多对多的关系时，通常需要设计一个中间表
+关联查询(多表查询)
+	多表查询规则： 
+		1）确定查询哪些表   
+		2）确定查询哪些字段   
+	    3）表与表之间连接条件 (规律：连接条件数量是表数量-1)
+	交叉连接查询：（不推荐。产生笛卡尔乘积现象：4 * 4=16，有些是重复记录）
+		SELECT empName,deptName FROM employee,dept;
+	内连接查询：只有满足条件的结果才会显示(使用最频繁)
+		需求：查询员工及其所在部门(显示员工姓名，部门名称)
+			SELECT empName,deptName         -- 2）确定哪些哪些字段
+			FROM employee,dept    			-- 1）确定查询哪些表
+			WHERE employee.deptId=dept.id   -- 3）表与表之间连接条件
+		内连接的另一种语法
+			SELECT empName,deptName
+			FROM employee
+			INNER JOIN dept
+			ON employee.deptId=dept.id;
+		使用别名
+			SELECT e.empName,d.deptName
+			FROM employee e
+			INNER JOIN dept d
+			ON e.deptId=d.id;
+		左[外]连接查询： 使用左边表的数据去匹配右边表的数据，如果符合连接条件的结果则显示，如果不符合连接条件则显示null
+			（注意： 左外连接：左表的数据一定会完全显示！）
+			select d.deptName,e.empName
+			from dept d
+			left outer join  employee e
+			on d.id=e.deptId;
+		右[外]连接查询: 使用右边表的数据去匹配左边表的数据，如果符合连接条件的结果则显示，如果不符合连接条件则显示null
+			（注意： 右外连接：右表的数据一定会完成显示！）
+			SELECT d.deptName,e.empName
+			FROM employee e
+			RIGHT OUTER JOIN dept d
+			ON d.id=e.deptId;
+		自连接查询,在一个表中查询
+			需求：查询员工及其上司
+			预期结果：       
+			 张三    null
+			 李四    张三
+			 王五    李四
+			 陈六    王五
+			select e.empName,b.empName
+				from employee e 
+				left outer join employee b
+				on e.bossId=b.id;
+mysql的变量
+	全局变量（内置变量）：mysql数据库内置的变量 （所有连接都起作用）
+		查看所有全局变量： show variables
+		查看某个全局变量： select @@变量名
+                    修改全局变量： set 变量名=新值
+        character_set_client: mysql服务器接收数据的编码
+        character_set_results：mysql服务器输出数据的编码
+	会话变量： 只存在于当前客户端与数据库服务器端的一次连接当中。如果连接断开，那么会话变量全部丢失！
+                    定义会话变量: set @变量=值
+                    查看会话变量： select @变量
+	局部变量： 在存储过程中使用的变量就叫局部变量。只要存储过程执行完毕，局部变量就丢失！！
+		定义局部变量：declare 变量名=变量值
+		查看局部变量：select 变量名
+存储过程:
+ 	带有逻辑的sql语句（编程）
+		之前的sql没有条件判断，没有循环
+		存储过程带上流程控制语句(if  while)
+	 存储过程特点
+		1）执行效率非常快！存储过程是在数据库的服务器端执行的！！！
+		2）移植性很差！不同数据库的存储过程是不能移植。
+	存储过程语法
+		创建存储过程
+			delimiter $       			 -- 声明存储过程的结束符
+			create procedure pro_test()  --存储过程名称(参数列表)
+			begin             			 -- 开始
+				-- 可以写多个sql语句;       -- sql语句+流程控制
+				select * from employee;
+			end $            			 -- 结束 结束符
+		执行存储过程
+			call pro_test();             -- CALL 存储过程名称(参数);		
+			参数：
+				in：   表示输入参数，可以携带数据带进存储过程中
+				out： 表示输出参数，可以从存储过程中返回结果
+				inout： 表示输入输出参数，既可以输入功能，也可以输出功能
+		删除存储过程：drop procedure pro_testOut;
+ 触发器:
+	当操作了某张表时，希望同时触发一些动作/行为，可以使用触发器完成
+	创建触发器(添加)
+		CREATE TRIGGER tri_empAdd AFTER INSERT ON employee FOR EACH ROW    -- 当往员工表插入一条记录时
+     	INSERT INTO test_log(content) VALUES('员工表插入了一条记录');
+         创建触发器(修改)
+		CREATE TRIGGER tri_empUpd AFTER UPDATE ON employee FOR EACH ROW    -- 当往员工表修改一条记录时
+     	INSERT INTO test_log(content) VALUES('员工表修改了一条记录');
+         创建触发器(删除)
+		CREATE TRIGGER tri_empDel AFTER DELETE ON employee FOR EACH ROW    -- 当往员工表删除一条记录时
+     	INSERT INTO test_log(content) VALUES('员工表删除了一条记录');
+mysql权限问题
+	mysql数据库，用户配置 : user表
+		USE mysql;
+		SELECT * FROM USER;
+	root ：拥有所有权限（可以干任何事情）
+	权限账户:只拥有部分权限（CURD）例如，只能操作某个数据库的某张表
+	修改mysql的用户密码：
+		UPDATE USER SET PASSWORD=PASSWORD('123456') WHERE USER='root';
+			password(): md5加密函数(单向加密)
+ 			SELECT PASSWORD('root'); -- *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
+	分配权限账户
+		grant 权限 on 数据库.表 to '账户名'@'账户类型' identified by '密码';
+		举例：
+			GRANT SELECT ON day16.employee TO 'eric'@'localhost' IDENTIFIED BY '123456';
+			GRANT DELETE ON day16.employee TO 'eric'@'localhost' IDENTIFIED BY '123456';
+		权限： select insert delete update drop create/ 或all
+			flush privileges 
+		账户类型:
+			localhost:只能本地访问
+			指定ip:只能是该ip的连接才能访问到，
+			%：本地和网络都能访问
+	备份和恢复：
+		备份:
+			mysqldump -uroot -p day17 > c:/bak.sql
+		恢复
+			mysql -uroot -p day17 < d:/back.sql
+		注意:在没有登录时输入备份与恢复的命令
+
+			
+			
+			

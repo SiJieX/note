@@ -1,0 +1,164 @@
+集合类的由来：
+	对象用于封装特有数据，对象多了需要存储，如果对象的个数不确定。
+	就使用集合容器进行存储
+集合框架的顶层接口:
+	Collection:
+		1.添加：
+			boolean add(Object obj):如果obj是集合会把集合作为元素存入集合
+			boolean addAll(Collection coll):会把集合中的元素作为元素存入集合
+		2.删除（会改变集合长度）：
+			boolean remove(Object o):依据的是equals方法
+			boolean removeAll(Collection obj):将两个集合中的相同元素从调用removeAll的集合中删除
+			void clear():清空集合
+		3.判断：
+			boolean contains(Object obj):依据的是equals方法
+			boolean containsAll(Collection coll):
+			boolean isEmpty():判断集合中是否有元素。
+		4.获取：
+			int size():
+			Iterator iterator(): 获得迭代器 （不能在迭代时操作集合）                                                  
+		5.其他：
+			boolean retainAll(Collection coll):取交集
+			Object[] toArray():将集合转成数组
+Collection：
+	|--List：有序(元素存入集合的顺序和取出的顺序一致)，元素都有索引。元素可以重复。
+	|--Set：无序(存入和取出顺序有可能不一致)，不可以存储重复元素。必须保证元素唯一性。
+Iterator：
+	迭代器：是一个接口。
+	作用：用于取集合中的元素。
+	获得迭代器：
+		集合对象.iterator;
+	方法：
+ 		boolean   hasNext()  如果仍有元素可以迭代，则返回 true。
+ 		    E	  next()   返回迭代的下一个元素。
+		  void	  remove()  从迭代器指向的 collection 中移除迭代器返回的最后一个元素（可选操作）。
+使用方式1：
+		Iterator it = coll.iterator();//循环结束后迭代器还能使用
+		while(it.hasNext()){
+			System.out.println(it.next());
+		}
+使用方式2
+		for(Iterator it = coll.iterator();it.hasNext(); ){//这样写使用后it对象释放，开发时推荐使用这种
+			System.out.println(it.next());
+		}
+使用方式3:
+	增强for循环
+	注意：增强for底层用得也是迭代器，因此不能对集合进行操作
+注意：
+	1.每一个集合都有自己的数据结构，都有特定的取出自己内部元素的方式。为了便于操作所有的容器，取出元素。将容器内部的取出方式按照一个统一的规则向外提供，这个规则就是Iterator接口。
+	也就说，只要通过该接口就可以取出Collection集合中的元素，至于每一个具体的容器依据自己的数据结构，如何实现的具体取出细节，这个不用关心，这样就降低了取出元素和具体集合的耦合性。
+	采用了内部类的方式
+	2.在进行list列表元素迭代的时候，如果想要在迭代过程中，想要对元素进行操作的时候，比如满足条件添加新元素。
+		会发生.ConcurrentModificationException并发修改异常。
+list集合特有方法：
+	添加：
+		 void add(int index, E element) :
+		 boolean addAll(int index, Collection<? extends E> c)
+	删除：
+		 E remove(int index)
+	修改：
+		 E set(int index, E element) 
+	获取：
+		 E get(int index) 
+		 int indexOf(Object o) 返回此列表中第一次出现的指定元素的索引；如果此列表不包含该元素，则返回 -1。
+		 int lastIndexOf(Object o) 返回此列表中最后出现的指定元素的索引；如果列表不包含此元素，则返回 -1
+		 List<E> subList(int fromIndex, int toIndex) 返回列表中指定的 fromIndex（包括 ）和 toIndex（不包括）(获取子列表)
+	获取迭代器：
+		 ListIterator<E> listIterator() ：list集合特有的迭代器。
+		 ListIterator<E> listIterator(int index) ：从指定位置获得迭代器
+		 	可以在迭代时增删改查集合
+接口 ListIterator<E>
+	 void add(E e) ：  将指定的元素插入列表
+	 boolean hasNext()
+	 E next() 
+	 boolean hasPrevious() ：
+	 E previous() ：可以倒着输出集合
+List：有序(元素存入集合的顺序和取出的顺序一致)，元素都有索引。元素可以重复。
+	|--ArrayList：底层的数据结构是数组,线程不同步，ArrayList替代了Vector，查询元素的速度非常快。
+	|--LinkedList：底层的数据结构是链表，线程不同步，增删元素的速度非常快。
+	|--Vector：底层的数据结构就是数组，线程同步的，Vector无论查询和增删都巨慢。（开发中基本不用）
+可变长度数组的原理：
+	当元素超出数组长度，会产生一个新数组，将原数组的数据复制到新数组中，再将新的元素添加到新数组中。
+	ArrayList：是按照原数组的50%延长。构造一个初始容量为 10 的空列表。
+	Vector：是按照原数组的100%延长。
+LinkedList：的特有方法。
+	addFirst();
+	addLast();
+	在jdk1.6以后。
+	offerFirst();
+	offerLast();
+
+	getFirst():获取链表中的第一个元素。如果链表为空，抛出NoSuchElementException;
+	getLast();
+	在jdk1.6以后。
+	peekFirst();获取链表中的第一个元素。如果链表为空，返回null。
+	peekLast();
+
+	removeFirst()：获取链表中的第一个元素，但是会删除链表中的第一个元素。如果链表为空，抛出NoSuchElementException
+	removeLast();
+	在jdk1.6以后。
+	pollFirst();获取链表中的第一个元素，但是会删除链表中的第一个元素。如果链表为空，返回null。
+	pollLast();
+堆栈：
+	先进后出：First In Last Out 简称FILO
+	
+队列：
+	先进先出：First In First Out 简称FIFO
+   
+
+		     
+ 
+ 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+集合：
+	相当于一个长度可变的数组（底层也是数组），集合存储的必须是引用数据类型
+	格式：
+		ArrayList<E> array=new ArrayList<E>();E代表集合里存储的引用类型的类名。
+	方法：
+		boolean add(E e):由于调用而发生更改，则返回 true。
+		void add(int index, E element) : 添加到指定位置  
+		获取元素：
+			public E get(int index):返回指定索引处的元素
+		集合长度：
+			public int size()：返回集合中元素的个数
+		删除元素：
+			public boolean remove(Object o)：删除指定元素，返回是否删除成功
+			public E remove(int index)：删除指定索引处的元素，返回被删除的元素
+		修改元素：
+			public E set(int index,E element)：在指定索引处，修改原有元素为给定元素，返回被修改的元素
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

@@ -1,0 +1,40 @@
+css:层叠样式表，将网页内容和显示样式进行分离，提高了显示功能，降低了耦合性
+css和html相结合的第一种方式：
+	用标签中的style属性，属性的值就是css代码
+css和html相结合的第二种方式：
+	使用style标签的方式<style type="text/css">代码</style>
+	因为要先加载css样式，因此最好把代码放到head标签里
+css和html相结合的第三种方式：
+	<style type="text/css">
+		 @import url(div.css)
+	</style>
+	在css文件中也可以导入其他css文件
+css和html相结合的第四种方式：
+	<link rel="stylesheet" href="div.css type="text/css">
+样式的优先级：
+	一般是后加载为主
+选择器：
+	html标签名选择器：标签名{}
+	class选择器：.class值{}
+	id选择器：#id值{}建议在页面中是唯一的，因为还要给js使用
+优先级：
+	标签选择器<类选择器<id选择器<style属性
+关联选择器：
+	用空格隔开：
+		span b a{}:选择器中的选择器
+组合选择器：
+	用逗号分开：
+		.city,span b{}同时设置样式
+伪元素选择器：
+	html中预先定义好的选择器
+	格式：标签名：伪元素；类名/标签名：伪元素
+	a:link:未点击状态
+	a:visited：被访问后的
+	a:hover:光标移动超链接时的状态
+	a:active：点击后的状态
+		记忆 ：lv ha
+display:
+	取值： block ：块对象的默认值。将对象强制作为块对象呈递，为对象之后添加新行
+		 none  ：隐藏对象。与 visibility 属性的hidden值不同，其不为被隐藏的对象保留其物理空间
+		 inline ：内联对象的默认值。将对象强制作为内联对象呈递，从对象中删除行
+	

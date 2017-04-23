@@ -1,0 +1,76 @@
+异常：
+	运行时期发生的不正常现象
+	通过面向对象的思想将异常封装成对象
+Throwable:
+	|--Error:错误，一般情况下，不编写针对性的代码进行处理，通常是jvm发生的，需要针对性的进行修正
+	|--Exception:异常，可以有针对性的处理方式
+	注意：
+		1.无论是错误还是异常，它们都有一个具体的子类体现每一个问题，他们的子类都有一个共性，就是都是以父类名作为子类的后缀名
+		2.这个体系中的所有类和对象都具备一个独有的特点；就是可抛性：体系中的类和对象都可以被throws和throw两个关键字所操作
+		3.java编译过程会先检查语法错误，在检查逻辑错误
+自定义异常：
+	1：定义一个子类继承Exception（必须抛出）或RuntimeException（可以不抛出），让该类具备可抛性。
+	2：通过throw 或者throws进行操作。
+
+
+异常的分类：
+	1.编译时被检测的异常：Exception和其子类都是，除了特殊子类RuntimeException体系。
+	2.编译时不检测异常（运行时异常：可以不抛出异常）就是Exception中的RuntimeException和其子类。
+编译时被检查的异常和运行时异常的区别：
+	编译被检查的异常在函数内被抛出，函数必须要声明，否编译失败。
+		声明的原因：是需要调用者对该异常进行处理。
+	运行时异常如果在函数内被抛出，在函数上不需要声明。
+		不声明的原因：不需要调用者处理，运行时异常发生，已经无法再让程序继续运行，所以，不让调用处理的，直接让程序停止，由调用者对代码进行修正。
+throw 和throws关键字的区别：
+	throw用于抛出异常对象，后面跟的是异常对象；throw用在函数内。
+	throws用于抛出异常类，后面跟的异常类名，可以跟多个，用逗号隔开。throws用在函数上。
+处理方式有两种：
+	1.抛出
+	2.捕捉；
+对于捕捉：java有针对性的语句块进行处理
+	try {
+		需要被检测的代码；
+
+	}
+	catch(异常类 变量名){
+
+		异常处理代码；
+	}
+	fianlly{
+
+		一定会执行的代码；
+	}
+	catch (Exception e) { //e用于接收try检测到的异常对象。
+		System.out.println("message:"+e.getMessage());//获取的是异常的信息。
+		System.out.println("toString:"+e.toString());//获取的是异常的名字+异常的信息（默认就是toString方法）
+		e.printStackTrace();//打印异常在堆栈中信息；异常名称+异常信息+异常的位置
+	}
+	注意：
+		1.功能抛出几个异常，功能调用如果进行try处理，需要与之对应的catch处理代码块，这样的处理有针对性，抛几个就处理几个。
+		2.try对应多个catch时，如果有父类的catch语句块，一定要放在下面。
+		3.通常情况函数内容如果有throw，抛出异常对象，并没有进行处理，那么函数上一定要声明，否则编译失败。但是也有特殊情况。
+		
+异常处理的原则：
+	1.函数内容如果抛出需要检测的异常，那么函数上必须要声明，否则必须在函数内用trycatch捕捉，否则编译失败
+	2.如果调用到了声明异常的函数，要么trycatch要么throw,否则编译失败
+	3.功能内容可以解决，用catch,解决不了用throw告诉调用者，有调用者解决。
+try  catch  finally的几种结合方式：
+	1，try catch finally
+	2，try catch
+	3, try finally
+		这种情况，如果出现异常，并不处理（处理不了），但是资源一定关闭，所以try  finally集合只为关闭资源。
+		finally很有用，主要用户关闭资源。无论是否发生异常，资源都必须进行关闭。
+		当catch中有System.exit(0);（退出jvm），只有这种情况finally不执行。
+Exception:
+	构造方法：
+		Exception() ：
+		Exception(String message)： 构造带指定详细消息的新异常。
+	继承与Throwable的方法：
+		 String getMessage() ：返回此 throwable 的详细消息字符串。
+		 void printStackTrace()：
+		 void printStackTrace(PrintStream s)
+		 void printStackTrace(PrintWriter s) 
+   
+ 
+	
+	

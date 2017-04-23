@@ -1,0 +1,88 @@
+AJAX:
+	Asynchronous Javascript And XML
+	历史栏：会收集原来已访问过的web页面，进行缓存
+   （5）缺点：不需变化的大量数据，也全部刷新，造成浏览器加载和处理负担	
+   （6）可改进的地方：让不需变化的大量数据，原封不动，不用缓存到历史栏中，无需全部刷新，只刷新某些需要变化的数据区域
+
+同步： 请求1->响应1->请求2->响应2->Web1.0时代
+异步：
+	    请求1->请求2->请求3->响应1->响应2->响应3
+	    请求1->响应1->请求2->请求3->响应2->响应3
+	  Web2.0时代
+       	 项目中：Web1.0为主（整个浏览器刷新），Web2.0为辅（浏览器局部刷新）
+AJAX
+	客户端（特指PC浏览器）与服务器，可以在【不必刷新整个浏览器】的情况下，与服务器进行异步通讯的技术
+	即AJAX是一个【局部刷新】的【异步】通讯技术
+	AJAX不是全新的语言，是2005年Google公司推出的一种全新【编程模式】，不是新的编程语言
+不用刷新整个页面便可与服务器通讯的办法有：
+       （A）Flash/ActionScript
+       （B）框架Frameset
+       （C）iFrame（内嵌入框架)
+       （D）XMLHttpRequest(非IE浏览器)和ActiveXObject(IE浏览器)
+	         背景：早上IE5时，微软就开发出了第一个异步通讯对象，叫ActiveXObject对象，
+	        Firefox等其它浏览器厂商也慢慢引入异步通讯对象，叫XMLHttpRequest对象，IE的高版本，
+	                    也将这个异步对象取名叫XMLHttpRequest对象，但IE有向下兼容问题，也可以使用ActiveXObject对象。
+	        注意：所有浏览器中都内置了异步对象，在默认情况下，该异步对象并没有创建出来
+AJAX开发步骤：
+	    步一：创建AJAX异步对象
+	    	var ajax= new XMLHttpRequest();
+	    步二：准备发送异步请求，
+	    	ajax.open(method,url,可选的boolean值)
+	  		 	 参数一：以什么方式发送，常用的用GET或POST，大小写不敏感
+	    		 参数二：发送到什么地方去，常用Servlet或Struts2或SpringMVC来接收，
+	    		 参数三：默认值为true，表示AJAX对象以【异步】的方式提交到服务端
+	            	     如果设置为false，表示AJAX对象以【同步】的方式提交到服务端
+	    			     这里只限于JavaEE学科	
+	    	注意：由于ie浏览器如果发送相同的url不会执行，因此最好在url后加上时间
+	    		var url = "${pageContext.request.contextPath}/TimeServletAjax?id="+new Date().getTime();
+	    步三：如果是POST请求的话，一定要设置AJAX请求头并且位于open()和send()方法之间
+	    	ajax.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+	    		"application/x-www-form-urlencoded"：表示以utf-8的编码方式进行请求数据的编码
+	    步四：真正发送请求体中的数据到服务器，
+	    	ajax.send()
+	    		ajax.send(null):get方式提交时使用
+	    		ajax.send(content):post方式提交
+	    			content中的内容以键值对的方式
+	    				var content = "userName="+name;
+	    步五：AJAX不断的监听服务端响应的状态变化，
+	    	ajax.onreadystatechange = function(){}
+	    	监听的五种状态码分别表示：
+	    		0：ajax异步对象创建好了，当没有准备发送请求
+	    		1：ajax异步对象已经调用了open()方法，但没有真正发送请求
+	    		2：ajax已经调用了send方法，但是没有发送的哦服务端
+	    		3：请求已经到达服务端，正在处理中，服务器正在将响应返回的过程中
+	    		4：异步对象已经接收到服务器的响应信息，当这是的状态码不一定是正确的
+	    			ajax.readyState：ajax异步对象监听的状态码
+	    			ajax.status==200：服务器返回的响应吗
+	    			上述5种状态不是所有浏览器都相同，但状态4每种浏览器都相同
+	    		注意：服务端要以流的方式返回数据
+	    	获取服务端返回的数据：ajax.responseText
+	    	获取服务端返回的xml数据：ajax.responseXML
+	    		同时服务端需要设置：
+	    			response.setContentType("text/xml;charset=UTF-8");
+	    步六：在无名处理函数中，获取AJAX的数据后，按照DOM规则，用JS语言来操作Web页面	
+数据载体
+   （1）HTML
+		（A）优点：服务端响应的是普通html字符串，无需JS解析，配合innerHTML属性效率高
+       	（B）缺点：如果需要更新WEB页面中的很多处地方，HTML不太方便，同时innerHTML属性不是DOM的标准，不能操作XML
+              	注意：innerHTML在xml中不能使用，用firstChild.nodeValue替代
+       	（C）适合：小量数据载体，且只更新在web页面中的一个地方
+   （2）XML
+   		（A）优点：是种通用的普通字符串格式，任何技术都能解析，标签名可以任意，使用DOM标准规则能够解析XML的任何部分
+       	（B）缺点：XML文件格式相当严格，出错后，responseXML属性返回NULL，如果XML文件过长，导致解析效率低下
+       	（C）适合：大量具有层次数据载体     
+   （3）JSON + struts2框架
+       	 兼备HTML和XML的特点
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	        

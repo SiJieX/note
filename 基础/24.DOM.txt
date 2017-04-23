@@ -1,0 +1,106 @@
+DOM:Document Object Model:文档对象模型
+	用来将标记型文档封装成对象，并将标记型文档中的所有内容（标签，文本，属性等）都封装成对象。方便对文档的操作
+		常见标记型文档：html， xml
+	dom树：按照标签的层次关系体现出标签的所属，形成一个树状结构称为DOM树，而树中的标签以及文本甚至属性称为节点
+			这个节点也称为对象，标签通常也称为页面中的元素
+	DOM技术的解析方式（w3c标准）：
+			将标记型文档解析成一棵DOM树，并将树中的内容都封装成节点对象
+				弊端：这种解析需要将整个标记型文档加载进内存，较为浪费内存空间
+	SAX技术的解析方式（民间组织定义的标准）：
+			基于事件驱动的解析方式，通过标签的开始和结束标记作为事件，获取数据的速度很快
+				弊端：不能进行增删改，只能查询
+	DOM三级模型：
+		DOM level ：将html文档封装成对象
+		DOM leve2   ：在level 1的基础上加入了新功能，比如解析名称空间
+		DOM leve2   ：将xml封装成了对象
+	Dhtml:动态的html,不是一门语言，是多项技术综合体的简称
+			包含：html,css,DOM,javascript
+			负责的内容：
+				html:用标签封装数据 
+				css:对数据进行样式的定义
+				DOM:将文档和标签以及其他内容封装成对象
+				JS:负责页面的行为的定义。就是页面的动态效果 
+	BOM：Browser Object Model 浏览器对象模型,
+			方便于操作浏览器
+	window对象：JavaScript 层级中的顶层对象，表示浏览器窗口。
+		属性：status：设置或获取位于窗口底部状态栏的信息。
+		方法：confirm(message)： 方法用于显示一个带有指定消息和 OK 及取消按钮的对话框。
+			setTimeout(code,millisec)用于在指定的毫秒数后调用函数或计算表达式。
+			setInterval(code,millisec[,"lang"])：循环调用
+			clearInterval(id_of_setinterval)：结束循环调用，id_of_setinterval是 由 setInterval() 返回的 ID 值。 
+			clearTimeout(id_of_settimeout)：结束调用，id_of_setinterval是由 setTimeout() 返回的 ID 值 
+			window.moveBy(x,y)：可相对窗口的当前坐标把它移动指定的像素。
+						x 要把窗口右移的像素数 
+						y 要把窗口下移的像素数 
+			window.moveTo(x,y)：绝对坐标移动
+			window.close()：用于关闭浏览器窗口。
+			window.open(URL,name,features,replace)：用于打开一个新的浏览器窗口或查找一个已命名的窗口。
+		事件： onload：页面完成加载后事件触发。
+			 onunload：关闭窗口后（看不到窗口）触发
+			 onbeforeunload：关闭窗口前（可以看到窗口）触发
+	navigator对象：包含关于 Web 浏览器的信息。
+		属性： appVersion:浏览器版本
+			 appName：浏览器名称
+	history对象：包含了用户已浏览的 URL 的信息
+		属性：length：获取历史列表中的元素数目。
+		方法： history.back():
+			 history.forward():
+			 history.go(number|URL):跳转到指定的历史页面
+	Location 对象:包含有关当前 URL 的信息
+				对象实际上是 JavaScript 对象，而不是 HTML DOM 对象。 
+		属性：既可以获取也可以设置值
+			protocol:设置或返回当前 URL 的协议。
+			href:设置或返回完整的 URL。设置值会跳转到URL
+	document对象：该对象将标记型文档进行了封装，最常用的就是获得文档中的节点对象
+		oElement = document.createElement(sTag):创建节点对象
+		方法：
+			获取节点方式一：
+			 getElementById(id值);通过便签的ID值获得节点对象，返回该标签节点
+			 getElementsByName(name值);返回所有name属性的值相同的标签的数组
+			 getElementsByTagName(标签名);返回所有给定标签名的数组（所有容器型的标签都有此方法）
+				节点都有三个必备的属性：节点名称，节点类型，节点值
+				常见节点有三种：标签节点：类型1    没有值
+							属性节点：类型2    有值
+							文本节点：类型3    有值
+			获取节点方式二：同过节点的层次关系
+				父节点：parentNode:对应一个节点对象
+				子节点：childNodes:对应一个节点数组
+				兄弟节点：存在兼容问题（可以通过去除文档中空格解决）
+					上一个兄弟节点：previousSibling
+					下一个兄弟节点：nextSilbing
+			oTextNode = document.createTextNode( [sText])：创建节点
+	节点对象的方法：
+		添加： oElement = object.appendChild(oNode)：添加子节点（多次操作会添加多次）
+			 object.innerHTML [ = sHTML ]：赋值必须为String类型的文字或html（只添加一次）
+		删除： oRemoved = object.removeNode( [bRemoveChildren])：bRemoveChildren：是否删除所有子节点
+			 oRemove = object.removeChild(oNode)：一般是先通调用parentNode方法在调用此方法
+		修改： oReplace = object.replaceNode(oNewNode)：较少用（原来的节点会移除）
+			 oReplace = object.replaceChild(oNewNode, oChildNode)：比较常用（原来的节点会移除）
+		克隆： oClone = object.cloneNode( [bCloneChildren])：bCloneChildren是否克隆所有子节点（不会移除原来的节点）
+		设置样式：object.style.accelerator(v) [ = sIsAccessible ]：通过style属性设置
+				样式封装的思想：
+						传参数过多，阅读性差
+						js代码和css代码耦合性高
+						不利于扩展
+					解决：
+						将多个所需的样式进行封装
+						封装到选择器中，只要给指定的标签加载不同的选择器即可
+		object.disabled [ = bDisabled ] ：禁用按钮
+	创建表格：
+		1.通过document.createElement("table")方法获得table对象
+		2.通过table对象的oTR = object.insertRow( [iIndex])方法创建行，并获得行对象
+		3,通过行对象的oTD = TR.insertCell( [iIndex])方法创建单元格，并获得单元格对象
+		4.通过单元格对象的innerHTML方法插入数据
+		5.获得要插入表格处的节点，通过oElement = object.appendChild(oNode)插入表格
+		
+		
+
+
+		
+		
+		
+			
+		
+		
+		
+			

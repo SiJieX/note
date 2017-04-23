@@ -1,0 +1,95 @@
+过滤器
+	基本概念
+	(3W1H:  why, what, where，how)
+	过滤器好处：重复代码的简化
+	项目开发中，经常会涉及到重复代码的实现！
+		注册 ---- Servlet 【1. 设置编码】 ----  JSP
+		修改 ----Servlet 【1. 设置编码】 ---  JSP
+		其他：
+			如判断用户是否登陆，只有登陆才能有操作权限！
+			涉及到重复判断： 获取session，取出session数据，判断是否为空,为空说明没有登陆，不能操作； 只有登陆后，才能操作！
+	过滤器，设计执行流程：
+		1.用户访问服务器
+		2.过滤器： 对Servlet请求进行拦截
+		3.先进入过滤器， 过滤器处理（如果有多个过滤器，就进入下一个过滤器）
+		4.过滤器处理完后， 在放行， 此时，请求到达Servlet/JSP
+		5.Servlet处理
+		6.Servlet处理完后，再依次回到过滤器, 最后再由tomcat服务器响应用户
+			(过滤器就像回家的门！)
+	开发步骤：
+		1.写一个普通java类，实现Filter接口
+		2.在web.xml中配置过滤器
+			<!-- 过滤器配置 -->
+			<filter>
+				<!-- 配置初始化参数（可选） -->
+				<init-param>
+					<param-name>encoding</param-name>
+					<param-value>UTF-8</param-value>
+				</init-param>
+				
+				<!-- 内部名称 -->
+				<filter-name>hello_filter</filter-name>
+				<!-- 过滤器类的全名 -->
+				<filter-class>cn.itcast.a_filter_hello.HelloFilter</filter-class>
+			</filter>
+			<filter-mapping>
+				<!-- filter内部名称 -->
+				<filter-name>hello_filter</filter-name>
+				<!-- 拦截所有资源 -->
+				<url-pattern>/*</url-pattern>
+				<url-pattern>index.jsp</url-pattern>
+			</filter-mapping>
+		3.对指定的请求拦截
+			可写多个url-pattern
+			拦截所有的请求
+				<filter-mapping>
+						<filter-name>hello_filter2</filter-name>
+						<url-pattern>/*</url-pattern>
+				</filter-mapping>
+			默认拦截的类型：(直接访问或者重定向)
+				<dispatcher>REQUEST</dispatcher>
+			拦截转发：
+				<dispatcher>FORWARD</dispatcher>
+			拦截包含的页面(RequestDispatcher.include(/page.jsp);对page.jsp也执行拦截)
+				<dispatcher>INCLUDE</dispatcher>
+			拦截声明式异常信息：
+				<dispatcher>ERROR</dispatcher>
+			根据servlet的内部名称拦截
+				<servlet-name>IndexServlet</servlet-name>
+			拦截指定的servlet 
+				<url-pattern>/index</url-pattern>
+过滤器相关Api
+	|-- interface  Filter:过滤器核心接口
+		void  init(filterConfig); 初始化方法，在服务器启动时候执行
+		void  doFilter(request,response,filterChain); 过滤器拦截的业务处理方法(访问时调用)
+		void destroy():销毁过滤器实例时候调用
+	|--interface  FilterConfig   获取初始化参数信息(web.xml中filter便签中存储的参数)
+		通过init方法传入
+		String	getInitParameter(java.lang.String name) 
+		Enumeration	getInitParameterNames() 
+		<!-- 配置初始化参数 -->
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	|-- interface  FilterChain  过滤器链参数；一个个过滤器形成一个执行链；
+		void doFilter(ServletRequest request, ServletResponse response)：  执行下一个过滤器或放行
+注意：
+	1.过滤器：方法参数没有自动命名，说明没有关联源码
+		关联tomcat或servlet源代码
+	2.连接池： 多刷新几次，报错！
+		- 连接没关
+			QueryRunner qr = new QueryRunner();
+			qr.update(con,sql);
+			这里con一定要关闭
+	    - 注意：dataSource 确定一个项目创建一次
+			QueryRunner qr = new QueryRunner(dataSource);
+		 修改连接池参数配置
+	3.编码
+		设置POST提交的请求的编码
+			request.setCharacterEncoding("UTF-8");
+		设置响应体的编码
+			response.setCharacterEncoding("UTF-8");
+		设置页面打开时候的编码格式、 设置响应体的编码
+			response.setContentType("text/html;charset=UTF-8");
+JSP引入ckeditor组件：客户端组件，便于用户输入内容！

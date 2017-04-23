@@ -1,0 +1,86 @@
+BeanUtils组件
+	程序中对javabean的操作很频繁， 所以apache提供了一套开源的api，方便对javabean的操作！即BeanUtils组件。
+	BeanUtils组件，  作用是简化javabean的操作(原理是反射)
+		注意1： 对于基本数据类型，会自动进行类型转换!
+			     当不是基本数据类型时，可以通过注册类型转化器
+				 static void register(Converter converter, Class clazz)
+					 clazz：要转换成的类型的字节码对象
+					 converter：可以用已经定义好的类型转化器，或者通过重写Converter接口的注册方法自定义转换器
+	使用BenUtils组件：
+		1.引入commons-beanutils-1.8.3.jar核心包
+		2.引入日志支持包: commons-logging-1.1.3.jar
+			如果缺少日志jar文件，报错：java.lang.NoClassDefFoundError: org/apache/commons/logging/LogFactory
+	方法1： 对象属性的拷贝
+		BeanUtils.copyProperty(admin, "userName", "jack");
+		BeanUtils.setProperty(admin, "age", 18);
+	方法2： 对象的拷贝
+		BeanUtils.copyProperties(newAdmin, admin);
+	方法3： map数据拷贝到javabean中  
+		BeanUtils.populate(adminMap, map);
+		注意：map中的key要与javabean的属性名称一致
+元数据：
+在jdbc中获取数据库的定义信息。例如：数据库、表、列的定义信息。就用到元数据。
+在jdbc中可以使用： 数据库元数据、参数元数据、结果集元数据
+(元数据定义相关api，  ..MetaData)
+	数据库元数据：DatabaseMetaData
+		通过Connection对象获得：
+			DatabaseMetaData getMetaData() 
+				 String getURL()
+				 String getUserName() 
+				 int getDatabaseMajorVersion() 
+	参数元数据：ParameterMetaData
+		通过 PreparedStatement对象获取：
+		 	ParameterMetaData getParameterMetaData()
+		 		int getParameterCount() ：参数个数
+		 		String getParameterTypeName(int param)
+	结果集元数据：  ResultSetMetaData
+		通过ResultSet对象获得
+		 	ResultSetMetaData getMetaData() 
+		 		 int getColumnCount() ：获取列的个数
+		 		 String getColumnName(int column) 获取指定列的名称（字段的名称）
+Dao操作的抽取,  BaseDao 
+	Dao操作通用的步骤：
+		0.写SQL语句
+		1.获取连接
+		2.创建stmt
+		3.执行sql
+		a)更新
+		b)查询
+		4.关闭/异常
+	通过的dao,
+		1.更新
+			public void update(String sql, Object[]  paramValues){};
+		2.查询
+			Public List<T> query(String sql , Object[] paramValues ,  Class<T> clazz);
+DbUtils组件
+	commons-dbutils 是 Apache 组织提供的一个开源 JDBC工具类库，它是对JDBC的简单封装，学习成本极低，
+	并且使用dbutils能极大简化jdbc编码的工作量，同时也不会影响程序的性能。因此dbutils成为很多不喜欢hibernate的公司的首选。
+	引入jar包：
+		下载组件，引入jar文件 : commons-dbutils-1.6.jar
+	核心api:
+		|-- DbUtils 用于关闭资源、加载驱动
+			DbUtils.close(con)
+		|-- QueryRunner   组件的核心工具类：定义了所有的与数据库操作的方法(查询、更新)
+			Int  update(Connection conn, String sql, Object param);   执行更新带一个占位符的sql
+			Int  update(Connection conn, String sql, Object…  param); 执行更新带多个占位符的sql (Object…  param这种方式可以输入任意个参数)
+			Int[]  batch(Connection conn, String sql, Object[][] params)        批处理
+			T query(Connection conn ,String sql, ResultSetHandler<T> rsh, Object... params)   查询方法
+			Int  update( String sql, Object param);  
+			Int  update( String sql, Object…  param); 
+			Int[]  batch( String sql, Object[][] params)       
+		注意： 如果调用DbUtils组件的操作数据库方法，没有传入连接对象，那么在实例化QueryRunner对象的时候需要传入数据源对象：
+	 		QueryRunner qr = new QueryRunner(ds);
+	DbUtils提供的封装结果的一些对象：
+		1）BeanHandler: 查询返回单个对象
+		2）BeanListHandler: 查询返回list集合，集合元素是指定的对象
+		3) ArrayHandler, 查询返回结果记录的第一行，封装成对象数组, 即返回：Object[]
+		4) ArrayListHandler, 把查询的每一行都封装为对象数组，再添加到list集合中
+		5) ScalarHandler 查询返回结果记录的第一行的第一列  (在聚合函数统计的时候用)
+		6) MapHandler  查询返回结果的第一条记录封装为map
+	
+ 
+ 
+  
+ 
+			
+ 

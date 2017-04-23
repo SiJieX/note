@@ -1,0 +1,214 @@
+xml：Extend Markup Languge（可扩展标签语言）
+	作用：
+		1.可以作为软件的配置文件
+		2.小型的数据库
+			
+	语法：
+		1.标签：
+			xml文件以xml后缀名结尾。
+			xml文件需要使用xml解析器去解析。浏览器内置了xml解析器。
+			语法： 双边标签：<student>...</student>
+				  空标签：<student></student>没有标签体内容
+				 	   <student/> 
+			注意：  
+				1.xml标签名称区分大小写。
+				2.xml标签名中间不能使用空格
+				3.xml标签名不能以数字开头
+				4.在一个xml文档中，有且仅有一个根标签
+		2.属性：
+			语法： <Student name="eric">student</Student>
+			注意：
+				1）属性值必须以引号包含，不能省略，也不能单双引号混用！
+				2）一个标签内可以有多个属性，但不能出现重复的属性名！
+		3.注释：
+			格式： <!--  xml注释 -->
+		4.文档声明：
+			语法： <?xml version="1.0" encoding="utf-8"?>
+				version: xml的版本号
+				encoding： 解析xml文件时查询的码表（解码过程时查询的码表）
+			注意：
+				1.如果在ecplise工具中开发xml文件，保存xml文件时自动按照文档声明的encoding来保存文件
+				2.如果用记事本工具修改xml文件，注意保存xml文件按照文档声明的encoding的码表来保存
+		5.转义字符：
+			特殊字符  转义字符
+			  <     &lt;
+			  >     &gt;
+			  "     &quot;
+			  &     &amp;
+			    空格        &nbsp;
+			 注意：以分号结束
+		6 CDATA块
+			作用： 可以让一些需要进行包含特殊字符的内容统一进行原样输出
+			格式：<![CDATA[
+						内容
+					]]>
+		7.处理指令(一般不会用到)
+			作用：告诉解析器如何解析xml
+			格式：<?xml-stylesheet type="text/css" href="1.css"?>
+xml约束：（能看懂约束内容，并根据约束内容写成符合约束的xml文件）
+	xml语法：规范xml文件的基本编写规则（有w3c组织制定的）
+	xml约束：规范xml文件的数据内容格式的规则（由开发者自行定义）
+	xml约束的两种技术：
+		DTD约束：语法相对简单，功能也相对简单，学习成本低
+			1.导入dtd方式（后缀名为dtd）
+				1.内部导入
+					<!DOCTYPE note [
+					  <!ELEMENT note (to,from,heading,body)>
+					  <!ELEMENT to      (#PCDATA)>
+					  <!ELEMENT from    (#PCDATA)>
+					  <!ELEMENT heading (#PCDATA)>
+					  <!ELEMENT body    (#PCDATA)>
+					]>
+				2.外部导入（本地）
+					<!DOCTYPE 根元素  SYSTEM "文件名">
+				     外部导入（网络）
+				    <!DOCTYPE 根元素  PUBLIC "地址">
+			2.DTD语法
+				约束标签
+					1.<!ELEMENT 元素名称 类别>
+					类别：
+						空标签： EMPTY。 表示标签里内容一定是空元素。
+						普通字符串： (#PCDATA)。表示标签里内容一定是普通字符串（不能含有子标签）。
+						任何内容： ANY。表示标签里内容可以是任意内容（包括子标签）
+				    2.<!ELEMENT 元素名称 (元素内容)> 
+				    	顺序问题：
+							<!ELEMENT 元素名称 (子元素名称 1,子元素名称 2,.....)>： 按顺序出现子标签
+						次数问题：
+								标签   ：  必须且只出现1次。
+								标签+  ： 至少出现1次
+							          标签*   ： 0或n次。
+								标签？  ： 0 或1次。
+				约束属性
+						<!ATTLIST 标签名称 属性名称 属性类型 默认值>
+					默认值（控制属性的有无）：
+						#REQUIRED 属性是必需的 
+						#IMPLIED   属性不是必需的 
+						#FIXED value 属性不是必须的，但属性值是固定的
+					属性类型（控制属性值的）：
+						CDATA ：表示普通字符串 
+						(en1|en2|..)： 表示一定是任选其中的一个值
+						ID：表示在一个xml文档中该属性值必须唯一。值不能以数字开头
+		Schema约束:语法复杂，功能也相对强大，学习成本高(后缀名为xsd)
+			名称空间：告诉xml文档的哪个元素被哪个schema文档约束。 在一个xml文档中，不同的标签可以受到不同的schema文档的约束。
+				1）一个名称空间受到schema文档约束的情况
+				2）多个名称空间受到多个schema文档约束的情况
+				3）默认名称空间的情况
+				4）没有名称空间的情况
+	解析：
+		DOM解析：
+			DOM解析原理：xml解析器一次性把整个xml文档加载进内存，然后在内存中构建一颗Document的对象树
+					      通过Document对象，得到树上的节点对象，通过节点对象访问（操作）xml文档的内容
+			封装的对象：
+				节点信息封装成Node对象
+					标签节点封装成Element对象
+					属性节点封装成Attribute对象
+					文本节点封装成Text对象
+			DOM解析工具:
+						1）JAXP （oracle-Sun公司官方）
+						2）JDOM工具（非官方）
+						3）Dom4J工具（非官方）
+								三大框架（默认读取xml的工具就是Dom4j）
+			 Dom4j工具:非官方，不在jdk中
+				使用步骤：
+					1.导入dom4j的核心包。 dom4j-1.6.1.jar
+					2.创建SAXReader对象;
+							SAXReader reader = new SAXReader(); 
+					3.读取xml文档，返回Document对象
+							Document doc = reader.read(new File("./src/contact.xml"));
+				Domj4读取xml文件:
+					节点：
+						  Iterator  Element.nodeIterator(); 获取当前标签节点下的所有子节点(不包括孙以后的节点)
+					标签：
+						  Element  Document.getRootElement()：获取xml文档的根标签		
+						  Element   ELement.element("标签名") ：指定名称的第一个子标签
+						  Iterator<Element> Element.elementIterator("标签名")： 指定名称的所有子标签的迭代器(推荐)
+						  List<Element>Element.elements()：获取所有子标签
+					属性：
+						先获得需要属性的标签
+						 	1.获取指定名称的属性值：
+									String   Element.attributeValue("属性名")(推荐)
+							2.获取指定名称的属性对象：			
+					 				Attribute  Element.attribute("属性名")
+					 		    获取所有属性对象：
+					 		     	List<Attribute>	 Element.attributes()
+					 		    获取所有属性对象的迭代器：
+					 		    	Iterator<Attribute>	Element.attibuteIterator()
+					 			    通过属性对象获取值：
+					 					获取属性名称：Attribute.getName() 
+										获取属性值	：Attibute.getValue()  
+					文本：
+						获取当前标签的文本
+							Element.getText() 
+						获取当前标签的指定名称的子标签的文本内容 
+							Element.elementText("标签名")(推荐) 
+						注意：文档中的空格换行也是便签的文本				
+				Domj4修改xml文件:
+					XMLWriter:
+						构造函数：
+							XMLWriter(OutputStream out)
+							XMLWriter(OutputStream, OutputForamt)：指定写入格式
+						方法：
+							void  write(Document doc)：
+						注意：
+							需要关流
+					OutputFormat：格式器
+						静态方法获取对象：
+							 static OutputFormat createCompactFormat()：紧凑的格式.去除空格换行.项目上线的时候
+							 static OutputFormat createPrettyPrint()：漂亮的格式.有空格和换行.开发调试的时候
+						设置编码的方法：
+							 void setEncoding(String encoding)： 同时影响了xml文档保存时的编码  和  xml文档声明的encoding的编码（xml解析时的编码）
+					增加： 
+						增加文档:	Document DocumentHelper.createDocument() 
+						增加标签	Element	addElement("名称")  
+						增加属性     Element	addAttribute("名称"，"值") 也可以用于修改 
+					修改：
+						修改属性值	: Attribute.setValue("值")  
+						修改同名的属性值: Element.addAtribute("同名的属性名","值")  
+						修改文本内容: Element.setText("内容")  
+					删除:
+						删除标签：	Element.detach();  
+						删除属性：	Attribute.detach(); 
+						删除文本：Element.setText("");
+				xPath技术  
+					作用：主要是用于快速获取所需的节点对象,是一门技术，Dom4j默认支持这种技术。其他地方也可以使用支持了这种技术的工具
+					在dom4j中使用xPath技术需要导入工具包：
+							1.导入xPath支持jar包 。  jaxen-1.1-beta-6.jar(在dom4j的lib包下面)
+							2.使用xpath方法:通过doc
+									List<Node>  selectNodes("xpath表达式");   查询多个节点对象
+									Node  selectSingleNode("xpath表达式");  查询一个节点对象
+					3.4 xPath语法
+							/         绝对路径       表示从xml的根位置开始的子元素（一个层次结构）
+									例子：/AAA；/AAA/CCC；/AAA/DDD/BBB
+							//        相对路径       表示不分任何层次结构的选择元素
+									例子：//BBB；//DDD/BBB
+							*         通配符           表示匹配所有元素
+									例子：/AAA/CCC/DDD/*；只是DDD下的子元素
+										/AAA/CCC/DDD//*；包括孙及以下元素
+										/*/*/*/BBB；//*（所有元素）
+							[]        条件               表示选择什么条件下的元素
+									例子：/AAA/BBB[1]；/AAA/BBB[last()]
+							@         属性               表示选择属性节点
+									//@id：返回的是属性节点
+									//BBB[@id]：返回的是标签节点
+									//BBB[@*]
+									//BBB[not(@*)]
+									//BBB[@id='b1']
+							and       关系               表示条件的与关系（等价于&&）
+							text()    文本               表示选择文本内容
+		SAX解析：
+			SAX解析工具：
+						1）Sax解析工具（oracle-sun公司官方）
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		

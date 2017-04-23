@@ -1,0 +1,253 @@
+Html:
+	超文本标记语言
+	代码不区分大小写
+标签分类：
+	双边标签：<标签 属性1="值"....>内容</标签>
+	单边标签：<标签 属性1="值"....>例如：<br/>:换行
+Html文档结构：
+	<html>
+		<head></head>
+		<body>
+			网页正文
+		</body>
+	</html>
+操作思想：
+	为了操作数据，都需要对数据进行不同标签的封装，通过标签中的属性对封装的数据进行操作，
+	标签就相当于一个容器。对容器中的数据进行操作，就是在不断的改变容器的属性值
+常见标签：
+	<b></b>加粗
+	<i></i>斜体
+	<u></u>下划线
+	<s></s>删除线
+	<sup></sup>上标
+	<sub></sub>下标
+	<font></font>字体标记，用户给字格式化
+	<span></span> 来组合行内元素，以便通过样式来格式化它们。
+	<div><div>来组合块元素，以便通过样式来格式化它们。
+排版标签：
+	<p></p>表示一个段落
+	<br>换行
+	<hr>水平线
+	<pre>预排版：原样输出
+标题标签：
+	<h1></h1>
+	<h2></h2>
+	<h3></h3>
+	<h4></h4>
+	<h5></h5>
+	<h6></h6>
+块元素：
+	独立占一行
+	<div><p><h1>...<h6><pre>等
+行内元素：
+	不会独立占一行
+	<font><b><i><u><sub><sup><img>
+列表标签：
+	<dl>
+		上层项目：<dt>
+		下层项目：<dd>(封装的内容是会被缩进的。有自动缩进的效果)
+有序标签：
+	<ol type="a">
+		<li>有序</li>
+		<li>有序</li>
+		<li>有序</li>
+	</ol>
+无序标签：
+	<ul>
+		<li>无序</li>
+		<li>无序</li>
+		<li>无序</li>
+	</ul>
+注意：无论有序和无序默认都有缩进效果
+图像标签：
+	<img src = "图片路径"/>
+		常用属性：height="数值";width="数值";alt="描述"：当鼠标放到图片上时会显示描述信息，当图片访问失败会显示描述信息
+		注意：如果图片想等比例缩放，只需指定一个高度或宽度
+			align属性只能让文本居中，不能让图片单独居中，可以再外套一个<div>标签
+		图像地图标签：<img>
+						<map>
+							<area/>
+							<area/>
+						</map>
+				   </img>
+表格标签：
+	<table>
+		属性： Width:可以是百分比，也可以使固定值
+			 Align：对其方式值：left，center,right
+			 Border:边框粗细
+			 Bordercolor:边框颜色
+			 bgColor:表格背景色
+			 background:背景图片URL
+			 cellpadding:单元格边线到内容间的距离（填充距离）
+			 cellspacing:单元格于单元格之间的距离
+			 rules:合并单元格边框线，取值all（兼容性不好，用CSS取代）
+	行<tr>
+		属性：Align对其方式
+	列
+		<td>
+			width:
+			height:
+			bgColor
+			background
+			align
+			valign
+			rowspan:上下单元格合并，合并属性必须放在第一个单元格中（在不同行增减单元格）
+			colspan:左右单元格和并，合并时，有增就有减，要保证每一个单元格的个数不变（在同一行增减单元格）
+		<th>标题单元格，居中加粗显示
+注意：<table>标签没有height属性，单元格的高就是行高；单元格的宽就是列宽
+超级链接：
+	<a 属性="值">...</a>
+		行内元素，不能再嵌套一个<a>标签
+	<a href="javascript:void()" >大字体</a>:href="javascript:void()"取消超链接的默认点击行为
+	常用属性：
+		href:目标文件的URL,如果没有写值，会默认打开该html的文件目录
+		target:目标文件的显示窗口
+			值：
+			_blank:在新窗口打开目标文件
+			_self:在当前窗口打开目标文件（默认）
+			_parent:在父级窗口打开目标文件
+			_top:在顶级窗口打开目标文件
+				_parent,_top用在框架网页中
+特殊链接：
+	1.下载链接：
+		浏览器不能执行的文件
+		<a href="文件路径">下载</a>
+	2.邮箱链接：
+		<a href="mailto:beijing@qq.com"></a>
+	3.普通空链接：
+		<a href="#"></a>
+		点击后无任何效果
+	4.JS链接：
+		<a href="javascript:window.close()">关闭窗口</a>
+锚点链接：
+	1.定义锚点：
+		<a name="锚点名称">（不写内容）</a>命名规则：字母，数字，下划线，不能以数字开头
+	2.跳转到锚点：
+		<a href="文件名#锚点名称">...</a>
+		注意：文件名可有可无。如果同一网页的不同部分跳转不需要文件名
+				如果是不同网页的跳转，就必须写文件名
+框架：
+	概念：
+		将一个浏览器窗口划分成若干个小窗口，每个小窗口显示独立的小窗口
+		框架集：<frameset>:用来划分窗口
+		框架页：<frame>:主要用来指定窗口默认的显示的网页地址
+框架网页的DTD必须是
+	<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML1.0 Frameset//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<frameset>属性：
+	cols:划分左右型框架：例如cols="200,*";cols="180,*,180";cols="20%,*"
+	rows:上下划分框架
+	frameborder:是否显示框架的边框线，取值：1或0；yes或no;
+	border:边框线的粗细
+	bordercolor:边框颜色
+<frame>框架页的属性：
+	src:该小窗口中默认显示的网页地址
+	noresize:不能调整小窗口的大小。如noresize="noresize"
+	scrolling:是否显示滚动条，取值auto,yes,no
+	name:给小窗口起名字，用来给<a>标记target属性来用得
+<noframes>...</noframes>:当浏览器不支持框架结构式出现的内容
+画中画标签：
+	<iframe src="...">(浏览器不支持时显示的内容)</iframe>：在窗口中划分一个独立的窗口显示该标签里的src地址的内容
+表单标签：
+	<form>
+		<caption></caption>:表格标题（格式化时放在<table>标签下）
+		属性：
+			name:用于javascript
+			method：表单的提交方式，值：get或post
+			action：指定表单的处理程序
+				如果值为空，表单数据提交给了自己
+			enctype:指定表单的编码方式（解密方式）
+				这个属性只能用在method="post"的情况下
+					值：application/x-www-form-urldecoded(默认的加密方式)
+					   multipart/form-data(如果是上传文件，值必须是它)
+单行文本域：
+	<input type="text" 属性="值"/>
+	常用属性：
+		name:
+		type:
+		value:
+		size:文本框的长度，以字符为单位
+		maxLength:
+		readonly="readonly"
+		disabled="disabled":禁用属性，只能选中，不能修改
+单行密码域：
+	<input type="password" />
+	常用属性：
+		name:
+		type:
+		value:
+		size:元素的长度，以字符为单位
+		maxLength:
+		readonly="readonly"
+		disabled="disabled":禁用属性，只能选中，不能修改
+单选按钮：
+	<input type = "radio"/>
+	常用属性：
+		name:
+			注意：一组单选按钮name值必须一致
+		value:
+			注意：因为单选按钮不能用户输入值，因此必须给定value的值
+		checked="checked"默认选择项
+复选按钮：
+	可以同时选多个，也可以一个都不选
+	<input type = "checkbox"/>
+	常用属性：
+		name:
+			注意：一组复选框的值必须相同
+		value:
+		checked="checked"
+下拉列表：
+	<select name = ""/>
+		<option value="">...</option>
+		<option value="">...</option>
+		<option value="">...</option>
+	</select>
+<select>只有一个属性：name
+<option>标记有两个属性：
+			value：
+			selected= "selected"
+文本区域：
+	<textarea name = "名称" cols="宽度"（字符为单位） rows = "高度">（默认文本）</textarea>
+各种按钮：
+	提交按钮：<input type="submit" value = "提交表单">			
+	重置按钮：<input type="reset" value = "重新填写">			
+	图片按钮：<input type="image" src="图片地址">：于submit按钮功能一样，用于美化默认样式			
+	普通按钮：<input type="buttom" onclick="" value="关闭窗口">：用于自定义按钮功能			
+上传文件域：
+	<input type = "file" />
+	常用属性：
+		name:	
+		value:表单元素的值，其实是上传的文件的文件名，是只读属性，只能来自用户手动选择的上传文件，不能用户自己指定
+表单格式化：
+	<form>标签里嵌套<table>标签
+get提交和post提交的区别：
+	1.get提交，提交的信息都显示在地址栏中
+	  post提交的信息不显示在地址栏中
+	2.get提交对应敏感的数据信息不安全
+	  post提交对于敏感信息安全
+	3.get提交，对数据大小有限制
+	  post提交没有限制
+	4.get提交时将信息封装到了请求消息的消息行中
+	  post提交将信息封装到了请求体中
+	5.在服务端的一个区别：
+		如果出现将中文提交的tomcat服务器，默认会用iso8859-1进行解码，会出现乱码
+		通过iso8859-1进行编码，再用指定的中文码表解码即可
+		这种方式对get和post提交都有效
+		但是对于post提交方式提交的中文，还可以通过request对象的
+		setCharacterEncoding方法直接设置指定的中文码表就可以将中文数据解析出来
+注意：如果客户端进行了增强型数据校验，服务端同样需要校验，因为可以通过地址栏提交任何数据
+	如果服务端做了增强型数据校验，客户端同样需要校验，为了减轻服务端的压力，和用户的体验
+其他标签：
+	头标签：
+		<head></head>头部分标签，包括title base meta link
+		<title>指定浏览器的标题栏显示的内容
+		<base>:
+			href属性:指定网页中所有的超链接的目录（本地或网路），结尾处一定要用/表示目录，只作用于相对路径的超链接文件
+			target属性：指定打开超链接的方式，作用于所有的超链接
+		<meta>：
+			name属性：网页的描述信息，当取keywords时，content属性的内容就作为搜索引擎的关键字进行搜索
+		<link>
+			rel属性：描述目标文档与当前文档的关系
+			type属性：文档类型
+			media:指定目标文档在哪种设备上起作用
+	<marquee>让内容动起来
+	<pre>:原样显示

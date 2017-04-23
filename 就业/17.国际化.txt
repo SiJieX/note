@@ -1,0 +1,78 @@
+国际化
+国际化又简称为 i18n：internationalization
+软件的国际化：
+	在中国： 显示中文，以及服务符合中国习惯的文本字符串！
+	在美国： 显示英文，以及服务符合他国习惯的文本字符串！
+	这种软件，就叫国际化的软件！
+如何做到国际化的软件，要求：
+	1.软件中存储特定的字符串
+	2.知道浏览器当前使用哪种语言（Locale）
+java提供了一个本地信息的api:Locale
+	 封装语言、国家信息的对象，由java.util提供
+	Locale locale = Locale.CHINA:获得国家信息的对象
+	static Locale getDefault() :获得当前系统默认的国家信息对象
+	String getCountry() ：国家的简称
+	String getDisplayCountry() ：国家名称
+	String getLanguage() ：语言简称
+	request中可以获得locale对象: 
+	 	Locale request.getlocal();
+ 静态数据国际化
+	网站中显示的固定文本的国际化： “用户名”“密码“
+	国际化的软件：
+		1.存储所有国家显示的文本的字符串
+			a)文件: properties
+			b)命名：  基础名（多个国家必须一样）_语言简称_国家简称.properties(可以到浏览器的语言首选项中查看)
+				例如： msg_zh_CN.properties     存储所有中文
+	      			 msg_en_US.properties    存储所有英文
+		2.程序中获取
+			ResourceBundle类，可以读取国际化的资源文件!
+				static ResourceBundle getBundle(String baseName, Locale locale) 
+					baseName:基础名（全名）
+ 				Enumeration<String> getKeys() 
+ 				String getString(String key) 
+ 				String[] getStringArray(String key) 
+ 动态文本国际化
+	数值，货币，时间，日期等数据由于可能在程序运行时动态产生，所以无法像文字一样简单地将它们从应用程序中分离出来，
+	而是需要特殊处理。Java 中提供了解决这些问题的 API 类(位于 java.util 包和 java.text 包中)
+	NumberFormat
+		Number parse(String source)  解析给定字符串开头的文本，生成一个数值。
+ 		String format(long number) :按不同国家的标准格式化
+	 	国际化货币
+			NumberFormat.getCurrencyInstance();
+		国际化数字
+			NumberFormat.getNumberInstance();
+		国际化百分比
+			NumberFormat.getPercentInstance();  
+	国际化日期
+		DateFormat.getDateTimeInstance(dateStyle, timeStyle, aLocale)
+		 日期样式：DateFormat.XXX
+	  	  	FULL   	2015年3月4日 星期三
+	  	  	LONG   	2015年3月4日
+	 	  	FULL   	2015年3月4日 星期三
+	     	MEDIUM 	2015-3-4
+	     	SHORT  	15-3-4
+	          时间样式：DateFormat.XXX
+	  	  	FULL   	下午04时31分59秒 CST
+	  	  	LONG   	下午04时32分37秒
+	    	MEDIUM 	16:33:00
+	     	SHORT  	下午4:33
+Jsp页面国际化 – 使用jstl标签
+	JSTL标签：
+		核心标签库
+		国际化与格式化标签库
+		数据库标签库(没用)
+	函数库
+		<fmt:setLocale value=""/>        设置本地化对象
+	  	<fmt:setBundle basename="" var="bundle"/>将工具类设置到域对象中     basename:基础名 设置工具类  var:工具类的变量名
+	  	<fmt:message key="username" bundle="${bundle}"></fmt:message> 显示国际化文本       key：properties文件的键，bundle：工具类对象
+	格式化数值
+		<fmt:formatNumber pattern="#.##" value="100.99"></fmt:formatNumber>：#.##：会格式化成两位小数不会自动补零，0.00:会格式化成两位小数会自动补零
+	格式化日期:
+		<fmt:formatDate pattern="yyyy-MM-dd" value="${date}"/>会格式化成pattern的样式	   
+
+			
+ 
+ 
+ 
+ 
+ 

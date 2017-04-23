@@ -1,0 +1,45 @@
+ 文件上传与下载
+	文件上传
+	案例：
+		注册表单/保存商品等相关模块！
+		注册选择头像 / 商品图片
+			(数据库：存储图片路径 / 图片保存到服务器中指定的目录)
+文件上传，要点:
+	前台：
+		1. 提交方式：post
+		2. 表单中有文件上传的表单项： <input type=”file” />
+		3. 指定表单类型:
+			默认类型：enctype="application/x-www-form-urlencoded"
+			文件上传类型：multipart/form-data
+				如果没有用框架，当设置了文件上传类型后就不能通过request.getParameter("name")获取值
+Apache提供的文件上传组件:FileUpload组件
+	文件上传功能开发中比较常用，apache也提供了文件上传组件！
+	FileUpload组件使用步骤: 
+		1. 下载源码
+		2. 项目中引入jar文件
+				commons-fileupload-1.2.1.jar  【文件上传组件核心jar包】
+				commons-io-1.4.jar     【封装了对文件处理的相关工具类】
+		3.创建文件上传工厂类：
+			DiskFileItemFactory factory = new DiskFileItemFactory()
+				setRepository(File file):设置临时目录
+		4.创建文件上传核心类
+			ServletFileUpload upload = new ServletFileUpload(factory);
+				upload.setFileSizeMax(30*1024*1024)：设置单个文件允许的最大的大小
+				upload.setSizeMax(80*1024*1024)：设置文件上传允许的总大小
+				upload.setHeaderEncoding("UTF-8")：设置上传表单文件名的编码
+					相当于：request.setCharacterEncoding("UTF-8");
+				upload.isMultipartContent(request)：判断： 当前表单是否为文件上传表单
+				List<FileItem> upload.parseRequest(request)：把请求数据转换为一个个FileItem对象，再用集合封装
+					boolean item.isFormField():	普通表单：true 			文件表单：false
+					item.getFieldName()：		普通表单：name属性的值  		文件表单：name属性的值
+					item.getString()：			普通表单：value属性的值 		文件表单：上传文件的内容
+					item.getString("UTF-8");  	指定编码：有中文时必须指定编码
+					item.getName()：				普通表单：null				文件表单：上传文件的文件名
+					item.getContentType()：		普通表达：null				文件表单：text/plain
+					item.getInputStream()：		上传文件流
+					item.write(File file)：		写到文件中
+					item.delete():				删除临时文件
+文件下载：
+	1.在响应行设置Content-Disposition：
+		response.setHeader("Content-Disposition", "attachment; filename="+name); 
+	2.用response获得流输出要下载文件的数据

@@ -1,0 +1,156 @@
+泛型：
+	jdk1.5版本以后出现的一个安全机制。表现格式：<>
+好处：
+	1：将运行时期的问题ClassCastException问题转换成了编译失败，体现在编译时期，程序员就可以解决问题。
+	2：避免了强制转换的麻烦。
+注意：
+	1.只要带有<>的类或者接口，都属于带有类型参数的类或者接口，在使用这些类或者接口时，
+	     必须给<>中传递一个具体的引用数据类型或接口。
+泛型技术：
+	其实应用在编译时期，是给编译器使用的技术，到了运行时期，泛型就不存在了。
+泛型的擦除：
+		也就是说，编辑器检查了泛型的类型正确后，在生成的class类文件中是没有泛型的。
+泛型的补偿：
+		因为存储的时候，类型已经确定了是同一个类型的元素，所以在运行时，只要获取到该元素的类型，在内部进行一次转换即可，所以使用者不用再做转换动作了。
+泛型类：
+	泛型类：将泛型定义在类上。
+	class Tool<Q> {
+		private Q obj;
+		public  void setObject(Q obj) {
+			this.obj = obj;
+		}
+		public Q getObject() {
+			return obj;
+		}
+	}
+泛型方法：
+	当方法操作的引用数据类型不确定的时候，可以将泛型定义在方法上（<>在必须在返回值前）
+	public <W> void method(W w) {
+		System.out.println("method:"+w);
+	}
+静态方法上的泛型：
+	静态方法无法访问类上定义的泛型。如果静态方法操作的引用数据类型不确定的时候，必须要将泛型定义在方法上。
+	public static <Q> void function(Q t) {
+		System.out.println("function:"+t);
+	}
+泛型接口.
+	interface Inter<T> {
+		void show(T t);
+	}
+	class InterImpl<R> implements Inter<R> {
+		public void show(R r) {
+			System.out.println("show:"+r);
+		}
+	}
+泛型关键字：
+	关键字 ：  ?
+		public void save(List<?> list) {}： 只能获取、迭代list;  不能编辑list
+		List<?> list = new ArrayList<String>():可以接收任何泛型集合， 但是不能编辑集合值； 所以一般在方法参数中用
+泛型限定：
+	上限：？extends E：可以接收E类型或者E的子类型对象。
+		上限什么时候用：
+			往集合中添加元素时，既可以添加E类型对象，又可以添加E的子类型对象。为什么？因为取的时候，E类型既可以接收E类对象，又可以接收E的子类型对象。
+	下限：？super E：可以接收E类型或者E的父类型对象。
+		下限什么时候用：
+			当从集合中获取元素进行操作的时候，可以用当前元素的类型接收，也可以用当前元素的父类型接收。
+泛型的反射:
+	查询数据库的时候可以写一个通用的根据id查询的方法：约定实体对象和数据库表名一样
+	Type：接口，任何类型默认的接口！
+                    包括： 引用类型、原始类型（基本数据类型）、参数化类型
+			 List<String>  list   =  new   ArrayList<String>();
+			  泛型集合：    list
+			  集合元素定义：new ArrayList<String>();  中的String
+			  参数化类型：“ArrayList<String> ” 为参数化类型
+			  	ParameterizedType 
+			  		方法： Type[] getActualTypeArguments()：获得参数的类型 (String的类型)
+接口 Map<K,V>(不是collection子类)
+	一次添加一对元素（键值对），collection一次添加一个元素
+	Map也称为双列集合，Collection集合称为单列集合，Map集合中必须保证键的唯一性,值可以重复
+嵌套类摘要(内部类)：
+	static interface Map.Entry<K,V>  
+方法：
+	添加：
+		V put(K key, V value) ：返回前一个和key关联的值，如果没有返回null
+			存多个相同的键值会被覆盖
+	删除：
+		void clear():清空集合
+		V remove(Object key):根据键删除值，返回该键对应的值
+	判断：
+		boolean containsKey(Object key) 
+		boolean containsValue(Object value) 
+		boolean isEmpty() 
+	获取：
+		 V get(Object key) 
+		 int size() ：获取键值对的个数
+		 Set<K> keySet() ：获得键的Set集合，从而可以获得Set集合的迭代器，遍历Map集合
+		 Collection<V> values() :获得所有值，返回值的集合，（值可以重复，从而是Collection集合）
+接口 Map.Entry<K,V>:
+	方法： K getKey() 
+	     V getValue() 
+	     V setValue(V value) 
+遍历Map集合的两种方式：
+	1.Set<Integer> keySet = map.keySet();
+		Iterator<Integer> it = keySet.iterator();
+		while(it.hasNext()){
+			System.out.println(map.get(it.next()));
+		}
+	2.Set<Entry<Integer,String>> entrySet = map.entrySet();
+		Iterator<Entry<Integer, String>> it = entrySet.iterator();
+		while(it.hasNext()){
+			Entry<Integer, String> next = it.next();
+			System.out.println(next.getKey()+"---"+next.getValue());
+		}
+Map集合常用子类：
+	|--Hashtable:内部结构是哈希表，是同步的。不允许null作为键，null作为值
+		|--Properties：用来存储键值对型的配置文件，可以和IO技术相结合
+	|--HashMap：内部结构是哈希表，是不同步的。允许null作为键，null作为值
+		|--LinkedHashMap:内部是链表结构，可以实现存入的顺序和取出的顺序一致，是有序的
+		注意：HashMap的键是对象时，需要覆写hashCode() equals(Object obj)方法，确定键的唯一性
+	|--TreeMap：内部结构式二叉树，是不同步的，可以对Map集合中的键进行排序
+Properties集合类:
+	特点：
+		1.没有泛型，键和值都是String类型 
+		2.集合中的数据可以保存到流中，或者从流中获取
+		3.通常该集合用于操作以键值对形式存在的配置文件
+	构造方法：
+		Properties()： 创建一个无默认值的空属性列表。
+	方法：
+		 Object setProperty(String key, String value) ：设置值
+		 String getProperty(String key)：通过键获取值  
+		 Set<String> stringPropertyNames() ：获得键的Set集合
+		 void list(PrintStream out) ：将属性列表输出到指定的输出流。
+		 void list(PrintWriter out) :
+		 void store(OutputStream out, String comments)：输出数据到其他地方 comments在文本中以#开头comments最好不写中文，不能解析(会自动加上时间)
+		 void load(InputStream inStream) ：读取输入流到集合中，注意：集合中必须是键值对 
+对已有的配置文件中的信息进行修改的思想：
+	1.读取配置文件
+	2.将键值的信息存入properties集合
+	3.在集合中进行修改
+	4.重新存入到配置文件
+ 
+ 
+		
+ 
+ 
+  
+ 
+ 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+ 
+	

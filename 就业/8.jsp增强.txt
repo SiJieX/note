@@ -1,0 +1,192 @@
+EL表达式
+	EL表达式作用：向浏览器输出域对象中的变量值或表达式计算的结果
+		jsp的核心语法： jsp表达式 <%=%>和 jsp脚本<%  %>。
+		以后开发jsp的原则： 尽量在jsp页面中少写甚至不写java代码。
+		使用EL表达式替换掉jsp表达式
+	语法： ${变量或表达式}:注意：${}中间不能有空格，并且和引号之间也不能有空格,后面也不能有空格
+		1.输出基本数据类型变量
+			1.1 从四个域获取
+				${name}
+				等价于:<%=pageContext.findAttribute("name")%>
+			1.2 指定域获取
+				${pageScope.name}
+				等价于:<%=pageContext.getAttribute("name",PageContext.PAGE_SCOPE)%>
+                    	域范围： pageScope / requestScope / sessionScope / applicationScope
+        2.输出对象的属性值
+			${student.name}:相当于调用getXX（）方法
+			等价于：<%=((Student)pageContext.findAttribute("student")).getName()%>
+		3.输出集合对象
+			List：${list[0].name } - ${list[0].age }：中括号相当于调用get(参数)方法
+			等价于：<%=((List)pageContext.findAttribute("list")).get(0)%>
+			Map： ${map["key"].name } -  ${map["key"].age }注意：key要加引号
+				 遍历集合时：${map.key}-${map.value.属性名}
+		4.EL表达式计算
+			1算术表达式
+    	 		+  -  *  /
+    	 		${10*5 }
+    	 	2比较运算
+    			>  <  >=  <=  ==  !=
+    			${10>5 }
+    		3.逻辑运算
+    	 		&&  ||  !
+    	 		${true && false }
+    	 	4.判空
+    	 		null 或 空字符串等价于empty
+    	 		${name==null || name=="" }等价于判空写法：${empty name }
+jsp标签
+	jsp标签作用：替换jsp脚本。
+		1.流程判断（if   for循环）
+		2.跳转页面（转发，重定向）
+		3.。。。。。
+	Jsp标签分类:
+		1.内置标签（动作标签）： 不需要在jsp页面导入标签
+		2.jstl标签： 需要在jsp页面中导入标签
+		3.自定义标签 ： 开发者自行定义，需要在jsp页面导入标签
+ 动作标签
+ 	转发标签：	<jsp:forward />
+ 		<jsp:forward page="/09.action2.jsp">
+    		<jsp:param value="jacky" name="name"/>
+    		<jsp:param value="123456" name="password"/>
+    	</jsp:forward>
+    		注意：传值时不能直接在page中的uil传值，只能用param标签
+    			 当参数含有中文是，要在发送方设置：request.setCharacterEncoding("utf-8");
+          参数标签：  <jsp:pararm/>
+	包含标签：  <jsp:include page=""></jsp:include>
+		原理： 包含与被包含的页面先各自翻译成java源文件，然后再运行时合并在一起。
+				（先翻译再合并），动态包含
+		静态包含  vs  动态包含的区别？
+			1. 语法不同
+				静态包含语法： <%@inclue file="被包含的页面"%>
+				动态包含语法： <jsp:include page="被包含的页面">
+			2.参数传递不同
+				静态包含不能向被包含页面传递参数
+				动态包含可以向被包含页面传递参数
+					 <jsp:include page="/common/header.jsp">
+   						<jsp:param value="lucy" name="name"/>
+   					 </jsp:include>
+			3.原理不同
+				静态包含： 先合并再翻译
+				动态包含： 先翻译再合并
+JSTL标签
+	JSTL (全名：java  standard  tag  libarary:java标准标签库  )
+		核心标签库 （c标签库） 天天用
+		国际化标签（fmt标签库）
+		EL函数库（fn函数库）
+		xml标签库（x标签库,不常用）
+		sql标签库（sql标签库，不常用）
+	使用JSTL标签步骤
+		1.导入jstl支持的jar包（标签背后隐藏的java代码）
+			注意：使用javaee5.0的项目自动导入jstl支持jar包
+		2.使用taglib指令导入标签库 
+			<%@taglib uri="tld文件的uri名称" prefix="tld文件的文件名" %>
+            <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>prefix前缀的意思(tld文件中的short-name标签的值)
+		3.在jsp中使用标签	
+	核心标签库的重点标签：		
+		保存数据到域中：保存数据(保存到域中)默认保存到page域 
+			<c:set var="name" value="rose" scope="request"></c:set>
+		从域中获取数据：value值用el表达式是输出域对象中的值，如果不是就原样输出 
+			<c:out value="${msg}" default="<h3>标题3</h3>" escapeXml="true"></c:out>
+    			default： 当value值为null时，使用默认值
+    			escapeXml: 是否对value值进行转义，false，不转义，true，转义（默认）就是原样输出<h3>标题3</h3>
+		单条件判断:text值为false或者true或者为EL表达式，直接写不会执行
+	    	<c:if test="${!empty msg}">
+	    		条件成立执行的代码
+	    	</c:if>
+		多条件判断:
+          <c:choose>
+    	  	<c:when test=""></c:when>
+    	  	<c:when test=""></c:when>
+          	<c:otherwise></c:otherwise>
+          </c:choose>
+          	注意：<c:choose>标签里面不能再嵌套<c:choose>
+   		 循环数据
+   		 	<c:forEach items="${list}" var="student" varStatus="varSta">
+    			序号：${varSta.count} - 姓名：${student.name} - 年龄：${student.age}
+    		</c:forEach>
+    		<c:forEach items="${map}" var="entry">
+    			${entry.key} - 姓名： ${entry.value.name} - 年龄：${entry.value.age}
+    		</c:forEach>
+	           	begin="" : 从哪个元素开始遍历，从0开始.默认从0开始
+	      		end="":     到哪个元素结束。默认到最后一个元素
+	      		step="" ： 步长    (每次加几) ，默认1
+	      		items=""： 需要遍历的数据（集合） 一般用EL表达式获取集合对象
+	      		var=""： 每个元素的名称 
+	      		varStatus=""： 当前正在遍历元素的状态对象
+	      			count属性：当前位置，从1开始
+	      	切割：
+          		<c:forTokens items="" delims=""></c:forTokens>
+          		delims：用什么数据切割
+          		items:要切割的数据
+          		var:分割后的变量
+        url标签
+	        <c:url var="url" value="DownloadServlet" scope="page">
+				<c:param name="name" value="${file.value}"></c:param>
+			</c:url>
+			注意：用于<a>标签中href传递数据
+		重定向
+          <c:redirect url="http://www.baidu.com"></c:redirect>
+          	注意：url中不需要加${requestScope.request.contextPath}	
+自定义标签：
+	自定义标签开发步骤
+		1.编写一个普通的java类，继承SimpleTagSupport类，叫标签处理器类
+		2.覆盖doTag()方法
+		3.在web项目的WEB-INF目录下建立xxxx.tld文件，这个tld叫标签库的声明文件（参考核心标签库的tld文件）
+			格式：
+				<?xml version="1.0" encoding="UTF-8" ?>
+				<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+				    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+				    version="2.1">
+				  <!-- 标签库的版本 -->
+				  	  <tlib-version>1.1</tlib-version>
+				  <!-- 标签库前缀 -->
+				 	  <short-name>itcast</short-name>
+				  <!-- tld文件的唯一标记 -->
+				  	  <uri>http://gz.itcast.cn</uri>
+				  <!-- 一个标签的声明 -->
+					  <tag>
+					    <!-- 标签名称 -->
+					    <name>showIp</name>
+					    <!-- 标签处理器类的全名 -->
+					    <tag-class>gz.itcast.a_tag.ShowIpTag</tag-class>
+					    <!-- 输出标签体内容格式 -->
+					    <body-content>scriptless</body-content>
+					  </tag>
+				</taglib>
+		3.在jsp页面的头部导入自定义标签库
+			<%@taglib uri="http://gz.itcast.cn" prefix="itcast"%>
+		4.在jsp中使用自定义标签
+			<itcast:showIp></itcast:showIp>
+	自定义标签的执行过程	
+		问题： http://localhost:8080/day14/01.hellotag.jsp  如何访问到自定义标签？
+		前提： tomcat服务器启动时，加载到每个web应用，加载每个web应用的WEB-INF目录下的所有文件。例如：web.xml, tld文件
+			1）访问01.hellotag.jsp资源
+			2）tomcat服务器把jsp文件翻译成java源文件->编译class->构造类对象->调用_jspService（）方法
+			3）检查jsp文件的taglib指令，是否存在一个名为http://gz.itcast.cn的tld文件。如果没有，则报错
+			4）上一步已经读到itcast.tld文件
+			5）读到<itcast:showIp> 到itcast.tld文件中查询是否存在<name>为showIp的<tag>标签
+			6）找到对应的<tag>标签，则读到<tag-class>内容
+			7）得到 gz.itcast.a_tag.ShowIpTag
+				构造ShowIpTag对象，然后调用ShowIpTag里面的方法
+	自定义标签处理器类的生命周期
+			SimpleTag接口： 
+				void setJspContext(JspContext pc)  		--设置pageContext对象，传入pageContext（一定调用）
+															通过getJspCotext()方法得到pageContext对象
+				void setParent(JspTag parent)  	   		--设置父标签对象，传入父标签对象，如果没有父标签，则不调用此方法。通过getParent()方法得到父标签对象。
+				void setXXX(值)                      	--设置属性值。
+				void setJspBody(JspFragment jspBody) 	--设置标签体内容。标签体内容封装到JspFragment对象中，然后传入JspFragment对象。通过getJspBody()方法														得到标签体内容。如果没有标签体内容，则不会调														用此方法
+				void doTag()                     		--执行标签时调用的方法。（一定调用）
+	自定义标签处理器类的生命周期:(在servlet中的Service方法中执行)
+			SimpleTag接口： 
+				void 	setJspContext(JspContext pc)  	--设置pageContext对象，传入pageContext（一定调用）
+															通过getJspCotext()方法得到pageContext对象
+				void 	setParent(JspTag parent)  		--设置父标签对象，传入父标签对象，如果没有父标签，则不														调用此方法。通过getParent()方法得到父标签对象。
+				void     setXXX(值)             			--设置属性值（有属性时调用）
+				void 	setJspBody(JspFragment jspBody) --设置标签体内容。标签体内容封装到JspFragment对象（有标签体时调用）													中，然后传入JspFragment对象。通过getJspBody()方法														得到标签体内容。如果没有标签体内容，则不会调														用此方法
+				void 	doTag()                     	--执行标签时调用的方法。（一定调用）
+
+    			
+    			
+    			
+    			
+    			

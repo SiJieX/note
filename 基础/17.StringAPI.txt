@@ -1,0 +1,83 @@
+API(Application Programming Interface, 应用程序编程接口):
+	一些预先定义的函数和类，目的是提供应用程序与开发人员基于某软件或硬件的以访问一组例程的能力，而又无需访问源码，或理解内部工作机制的细节。
+在lang包的类不用导包
+对象1==对象2:
+	引用数据类型：比较的是对象的地址值
+	基本数据类型：比较的是值是否相等
+Scanner 类:
+	方法：nextLine();
+	返回值：String 
+	内容：获取从键盘输入的数据（基本数据类型，字符串类型），以字符串形式返回。
+	
+String 类:
+	字符串类，由多个字符组成的一串数据，字符串本质是一个字符数组
+	构造方法：
+		String(String original):把字符串数据封装成字符串对象
+		String(char[] value):把字符数组封装成字符串对象
+		String(char[] value，int index,int count):把字符数组的索引为index到count的字符封装成字符串对象
+		直接赋值的形式初始化字符串对象：最常用的形式
+	方法：
+		判断功能：
+			boolean	equals(boject obj)：比较字符串的内容是否相等
+			boolean equalsIgnoreCase(String str):比较字符串的内容是否相等，不区分大小写	
+			boolean startsWith( string str):判断字符串的内容是否以字符串str开头（区分大小写）
+			boolean endsWith(String str):判断字符串的内容是否以字符串str结尾（区分大小写）
+		获取功能：
+			int length():获取字符串的长度，也就是字符的个数(一个汉字的数量是一)
+			char charAt(int index):获取指定索引处的字符
+			int indexOf(String str):获取指定字符或字符串在字符串中第一次出现的索引（如果没有返回-1）
+			int lastIndexOf(String str):获取指定字符或字符串在字符串中最后一次出现的索引（如果没有返回-1）
+			String subString(int start):从start索引处截取后面的字符串（包括start）
+			String subString(int start,int end):截取从索引start到end的字符串，包括start不包括end
+		转换功能：
+			char[] toCharArray():转换为字符数组
+			String tolowerCase():转换为小写字母
+			String toUperCase():转换为大写字母
+			String trim():去除字符串两端的空格：
+			String[] split（String str）:按照指定字符串分割字符串
+				
+
+注意：
+	1.字符串覆写了toString方法，返回的是字符串对象的数据。（在打印语句里会自动加上toString方法）
+	2.字符串的内容是存储在方法区的常量池里面的，是为了方便字符串的重复使用的，减少对堆内存的占用
+	3.通过构造方法创建的对象和直接赋值的区别：
+		构造方法：
+			对象是在堆内存（1个new语句会创建2个对象）
+		直接赋值：
+			直接到方法区的常量池中去寻找
+	4.字符串在常量池创建之后不能更改，在一个+=操作后会产生三个字符串，并且不会消失
+	5.String对象被final修饰，指向不会改变
+StringBulider：
+	是一个可变的字符串。字符串缓冲区类。
+	+=拼接字符串耗费内存原因：
+		每次拼接都会产生新的字符串对象,而利用StringBuilder来拼接字符串自始至终用的都是同一个StringBuilder容器
+	构造方法：
+		StringBuilder() 
+		StringBuilder(String str) ：将String转成StringBulider
+	成员方法：
+		 int capacity()：理论值（缓冲区的大小）
+		 int length()：实际值字符的个数
+		 StringBuilder append(任意类型) ：添加数据并返回自身对象
+		 StringBuilder reverse()：反转(String类没有此功能)
+		 String toString()：将StringBulider转成String
+		 StringBuilder delete(int start, int end) ：移除缓冲区的内容
+ 
+
+StringBulider和String的转换：
+	将StringBulider转成String：String toString()
+	将String转成StringBulider：StringBuilder(String str)
+	
+
+StringBuffer:
+	字符串缓冲区，用于存储数据的容器（不是String类的子类）。
+	特点：
+		1.长度是可变的
+		2.可以存储不同类型的数据
+		3.最终会转化成字符串进行使用
+		4.可以对字符串进行修改
+	构造函数：
+		StringBuffer():构造一个其中不带字符的字符串缓冲区，其初始容量为 16 个字符。
+		
+容器具备的功能：
+	1.添加
+	2.删除

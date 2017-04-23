@@ -1,0 +1,12 @@
+ctrl+2 松开 L:自动补齐返回类型
+将html文档转成在servlet输出步骤：
+	1.将html双引号替换成单引号
+	2.在html文件前加“ html+=" ”
+		alt+shift+A区块选择
+	3.在html文件的每行加“ "; ”
+		find:^(.*)$
+		replace with:\1";
+ctrl+shift+r:查找当前项目中资源(类，文件)
+Ctrl+shift+T ：查看源码jar包中的类
+alt+shift+L:快速获取方法返回值
+alt+左/右：返回上一个/下一个文件

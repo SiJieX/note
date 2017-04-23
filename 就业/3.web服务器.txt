@@ -1,0 +1,110 @@
+3 Web开发入门
+	引入
+		之前的程序： java桌面程序，控制台控制，socket gui界面。javase规范
+		现在和以后的程序：java web程序。浏览器控制。javaee规范
+	软件的结构
+		C/S (Client - Server  客户端-服务器端)
+			典型应用：QQ软件 ，飞秋，红蜘蛛。
+				特点：
+					1.必须下载特定的客户端程序。
+					2.服务器端升级，客户端升级。
+		B/S （Broswer -Server 浏览器端- 服务器端）
+			典型应用： 腾讯官方（www.qq.com）  163新闻网站， 传智官网（俗称：网站）
+				特点：
+					1.不需要安装特定的客户端（只需要安装浏览器即可）
+					2.服务器端升级，浏览器不需要升级
+				javaweb的程序就是b/s软件结构
+服务器:
+	从物理上来说，服务器就是一台PC机器。8核，8G以上，T来计算，带宽100M
+	web服务器：PC机器安装一个具有web服务的软件，称之为web服务器
+	数据库服务器：PC机器安装一个具有数据管理件服务的软件，称之为数据库服务器
+	邮件服务器：PC机器安装一个具有发送邮件服务的软件，称之为邮件服务器
+web服务软件
+	web服务软件的作用：把本地的资源共享给外部访问
+	常用的web服务软件：
+		WebLogic: BEA公司的产品。 收费的。支持JavaEE规范。
+		WebSphere： IBM公司的产品。收费的。支持JavaEE规范
+		JBoss: Redhat公司的产品。收费的。支持JavaEE规范
+		Tomcat： 开源组织Apache的产品。免费的。支持部分的JavaEE规范。（servlet、jsp。jdbc，但ejb， rmi不支持）
+			javase的规范,包含IO流，线程，集合，socket编程
+Tomcat基本使用
+	下载并按装
+		1.到apache官网。www.apache.org http://jakarta.apache.org(产品的主页)
+		2.选择版本：
+			安装版：window （exe、msi） linux（rmp）
+			压缩版：window（rar，zip） linux（tar，tar.gz）学习时候使用
+	运行和关闭tomcat
+		 启动软件
+			a.找到%tomcat%/bin/startup.bat ，双击这个文件
+			b.弹出窗口，显示信息（不要关闭次窗口）
+			c.打开浏览器，输出以下地址
+				http://localhost:8080
+			d.看到一只猫画面，证明软件启动成功！
+		关闭软件
+			a.找到%tomcat%/bin/shutdown.bat，双击这个文件即可！
+			b.打开浏览器，输出以下地址。看到“无法连接”（最好先清空浏览器缓存）
+	tomcat软件使用的常见问题:
+		1.闪退问题
+			原因：tomcat软件是java语言开发的。 tomcat软件启动时，会默认到系统的环境变量中查找一个名称叫JAVA_HOME的变量。
+				 这个变量的作用找到tomcat启动所需的jvm
+				解决办法: 到环境变量中设置JAVA_HOME的变量:
+					JAVA_HOME= C:\Program Files\Java\jdk1.6.0_30  (注意别配置到bin目录下)
+		2.端口占用的错误
+			原因： tomcat启动所需的端口被其他软件占用了！
+			解决办法： 
+				a.关闭其他软件程序，释放所需端口
+				b.修改tomcat软件所需端口
+				       找到并修改%tomcat%/conf/server.xml文件
+		3.CATALINA环境变量问题
+			原因： tomcat软件启动后，除了查找JAVA_HOME后，还会再查找一个叫CATALINA_HOME变量，这个变量的作用是设置tomcat的根目录。
+			解决办法：建议不要设置CATALINA_HOME变量。检查如果有的话，清除掉
+5 Tomcat的目录结构
+		|-bin: 存放tomcat的命令。
+			catalina.bat 命令：
+				startup.bat  -> catalina.bat start	
+				shutdown.bat -> catalina.bat stop
+	    |- conf: 存放tomcat的配置信息。其中server.xml文件是核心的配置文件。
+		|-lib：支持tomcat软件运行的jar包。其中还有技术支持包，如servlet，jsp
+		|-logs：运行过程的日志信息
+		|-temp: 临时目录
+		|-webapps： 共享资源目录。web应用目录。（注意不能以单独的文件进行共享）
+		|-work： tomcat的运行目录。jsp运行时产生的临时文件就存放在这里
+Web应用的目录结构
+		|- WebRoot :  web应用的根目录
+			|- 静态资源（html+css+js+image+vedio）
+			|- WEB-INF ： 固定写法。
+				|-classes： （可选）固定写法。存放class字节码文件
+				|-lib： （可选）固定写法。存放jar包文件。
+				|-web.xml  
+		注意：
+			1）WEB-INF目录里面的资源不能通过浏览器直接访问
+			2）如果希望访问到WEB-INF里面的资源，就必须把资源配置到一个叫web.xml的文件中。  
+手动开发动态资源：
+	静态资源和动态资源的区别：
+		静态资源： 当用户多次访问这个资源，资源的源代码永远不会改变的资源。
+		动态资源：当用户多次访问这个资源，资源的源代码可能会发送改变。
+	动态资源的开发技术
+		Servlet : 用java语言来编写动态资源的开发技术。
+		Servlet特点：
+			1.普通的java类，继承HttpServlet类，覆盖doGet方法
+			2.Servlet类只能交给tomcat服务器运行！！！！（开发者自己不能运行！！！）
+	Servlet手动编写步骤：
+		1.编写一个servlet程序，继承HttpServlet
+			如果项目不是web项目，需要导入javaEE的jar包
+		2.找到HelloServlet类的class字节码，然后带包拷贝到tomcat的一个web应用中WEB-INF/classes目录下
+		3.在当前web应用下的web.xml文件配置Servlet。
+			<!-- 配置一个servlet程序 -->
+				<servlet>
+					<!-- servlet的内部名称 ，可以自定义-->
+					<servlet-name>HelloServlet</servlet-name>
+					<!-- servlet类名： 包名+简单类名-->
+					<servlet-class>gz.itcast.d_servlet.HelloServlet</servlet-class>
+				</servlet>
+				<servlet-mapping>
+					<!-- servlet的内部名称，和上面的名称保持一致！！！-->
+					<servlet-name>HelloServlet</servlet-name>
+					<!-- servlet的访问名称： /名称 -->
+					<url-pattern>/hello</url-pattern>
+				</servlet-mapping>
+		4.启动tomcat服务器，运行访问
+			访问servlet:  http://localhost:8080/myweb/ hello

@@ -1,0 +1,144 @@
+http协议： 对浏览器客户端 和  服务器端 之间数据传输的格式规范
+	注意：HTTP是WEB大众化非安全协议	 	
+		HTTPS是WEB安全协议，是基于HTTP协议的，且加了一些加密等特殊功能，常用于在线支付，或者是需要安全性较高的网站中，例如：12306网站	
+	查看http协议的工具
+		1.使用火狐的firebug插件（右键->firebug->网络）
+		2.使用谷歌的“审查元素”
+		3.使用系统自带的telnet工具（远程访问工具）				
+			a.telnet localhost 8080      访问tomcat服务器
+			b.ctrl+] 回车    可以看到回显
+			c.输入请求内容
+				GET /day09/hello HTTP/1.1
+				Host: localhost:8080
+			d.回车，即可查看到服务器响应信息
+ Http请求:
+ 	注意：只要标签里有图片标签，会发送一次请求
+	请求行:GET /day09/hello HTTP/1.1  
+		#http协议版本
+			http1.0：当前浏览器客户端与服务器端建立连接之后，只能发送一次请求，一次请求之后连接关闭。
+			http1.1：当前浏览器客户端与服务器端建立连接之后，可以在一次连接中发送多次请求。（基本都使用1.1）
+		#请求资源
+			URL:  统一资源定位符。
+				http://localhost:8080/day09/testImg.html。只能定位互联网资源。是URI的子集
+			URI： 统一资源标记符。
+				/day09/hello :用于标记任何资源。可以是本地文件系统，局域网的资源（//192.168.14.10/myweb/index.html）
+		#请求方式
+			常见的请求方式： GET 、 POST、 HEAD、 TRACE、 PUT、 CONNECT 、DELETE	
+			常用的请求方式： GET  和 POST	
+			表单提交：
+				<form action="提交地址" method="GET/POST">...</form>
+			GET和POST区别：
+				1.GET方式提交 
+					a.地址栏（URI）会跟上参数数据,以？开头，多个参数之间以&分割
+						GET /day09/testMethod.html?name=eric&password=123456 HTTP/1.1
+					b.GET提交参数数据有限制，不超过1KB。
+					c.GET方式不适合提交敏感密码。
+						注意： 浏览器直接访问的请求，默认提交方式是GET方式
+				2.POST方式提交
+					a.参数不会跟着URI后面。参数而是跟在请求的实体内容中。没有？开头，多个参数之间以&分割
+					b）POST提交的参数数据没有限制。
+					c）POST方式提交敏感数据。
+	请求头（多个key-value对象）:
+		Accept: text/html,image/*         -- 浏览器接受的数据类型
+		Accept-Charset: ISO-8859-1        -- 浏览器接受的编码格式
+		Accept-Encoding: gzip,compress    --浏览器接受的数据压缩格式
+		Accept-Language: en-us,zh-        --浏览器接受的语言
+		Host: www.it315.org:80            --（必须的）当前请求访问的目标地址（主机:端口）
+		If-Modified-Since: Tue, 11 Jul 2000 18:23:51 GMT   --浏览器最后的缓存时间
+		Referer: http://www.it315.org/index.jsp            -- 当前请求来自于哪里
+		User-Agent: Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 5.0)  --浏览器类型
+		Cookie:name=eric                     -- 浏览器保存的cookie信息
+		Connection: close或者Keep-Alive       -- 浏览器跟服务器连接状态。close: 连接关闭  keep-alive：保存连接。
+		Date: Tue, 11 Jul 2000 18:23:51 GMT  -- 请求发出的时间
+	 实体内容（实体内容和请求头中间隔一空行）:
+		只有POST提交的参数会放到实体内容中,要得到实体内容就要覆盖doPost方法
+			name=eric&password=123456
+	 HttpServletRequest对象：作用是用于获取请求数据
+		核心的API：
+			请求行： 
+				request.getMethod()：  请求方式
+				request.getRequestURI()： 请求uri
+				request.getRequestURL()：   请求url
+				request.getProtocol()：   请求http协议版本
+				request.getQueryString()：获取GET方式参数
+			请求头：
+				request.getHeader("请求头名称")：根据请求头获取请求值
+				Enumeration<String>	request.getHeaderNames()：获取所有的请求头名称
+			实体内容:
+				request.getInputStream() ：获取实体内容数据（获取POST方式参数）
+			获取传递的请求参数:
+				获取GET方式参数：
+					request.getQueryString();
+				获取POST方式参数：
+					request.getInputStream();
+				通用的方式：
+					request.getParameter("参数名");  
+						根据参数名（xml标签的属性名）获取参数值（注意，只能获取一个值的参数）
+					String[] request.getParameterValue("参数名")；
+						根据参数（xml标签的属性名）名获取参数值（可以获取多个值的参数（多选框内容））
+					Enumeration<String>	request.getParameterNames();   获取所有参数名称列表  
+					Map<String,String[]> getParameterMap():map中键是字符串类型，值是字符串数组类型
+		请求参数编码问题
+			修改POST方式参数编码：
+					request.setCharacterEncoding("utf-8");
+			修改GET方式参数编码：
+					手动解码：String name = new String(name.getBytes("iso-8859-1"),"utf-8");
+		响应实体编码问题：
+			当用response.getWriter().write():方法时，默认是以iso-8859-1进行的编码。
+				因此在写入前应该设置:response.setCharacterEncoding("utf-8");
+			当用字符流时需要设置：
+				response.getOutputStream().write("你好".getBytes("utf-8"))
+		service 和 doXX方法区别:
+			HttpSevlet首先会调用service(HttpServletRequest req, HttpServletResponse resp)方法,判断是什么请求方式，如果是get方式
+			就调用doGet方法，如果是post请求就调用doPost方法
+	Http响应:
+		响应行:HTTP/1.1 200 OK 
+			HTTP/1.1:http协议版本
+			200:状态码: 服务器处理请求的结果（状态）
+				常见的状态：
+					200 ：  表示请求处理完成并完美返回
+					302：   表示请求需要进一步细化。
+					404：   表示客户访问的资源找不到。
+					500：   表示服务器的资源发送错误。（服务器内部错误）
+			OK:状态描述
+		常见的响应头:
+			Location: http://www.it315.org/index.jsp    		--表示重定向的地址，该头和302的状态码一起使用。
+			Server:apache tomcat                 				--表示服务器的类型
+			Content-Encoding: gzip                      		--表示服务器发送给浏览器的数据压缩类型
+			Content-Length: 80                          		--表示服务器发送给浏览器的数据长度
+			Content-Language: zh-cn                     		--表示服务器支持的语言
+			Content-Type: text/html; charset=GB2312     		--表示服务器发送给浏览器的数据类型及内容编码
+			Last-Modified: Tue, 11 Jul 2000 18:23:51 GMT    	--表示服务器资源的最后修改时间
+			Refresh:1;url=http://www.it315.org     				--表示定时刷新
+			Content-Disposition: attachment; filename=aaa.zip   --表示告诉浏览器以下载方式打开资源（下载文件时用到）
+			Transfer-Encoding: chunked
+			Set-Cookie:SS=Q0=5Lb_nQ; path=/search   			--表示服务器发送给浏览器的cookie信息（会话管理用到）
+			Expires: -1                           				--表示通知浏览器不进行缓存
+			Cache-Control: no-cache
+			Pragma: no-cache
+			Connection: close或者Keep-Alive           			--表示服务器和浏览器的连接状态。close：关闭连接 keep-alive:保存连接		
+		实体内容：与响应头之间有一空行，用于传输浏览器的请求数据
+		HttpServletResponse对象
+			HttpServletResponse对象修改响应信息：
+				响应行：  response.setStatus() ：设置状态码
+				响应头：  response.setHeader("name","value")：设置响应头
+					   response.sendRedirect("/webDemo/ad.html")：设置重定向地址
+				实体内容： response.getWriter().writer()：   发送字符实体内容
+					    response.getOutputStream().writer()：  发送字节实体内容 
+		案例：请求重定向（Location）：通过设置响应行中的状态码为302，以及响应头的Location的值，进行跳转到相应的页面
+				1.response.setStatus(302)
+				  response.setHeader("location", "/webDemo/ad.html")
+				2.response.sendRedirect("/webDemo/ad.html")
+		 案例：定时刷新(refresh)通过设置响应头的refresh属性来定时刷新当前页面或跳转到另一页面
+		 		定时刷新当前页面：
+		 			response.setHeader("refresh", "1")
+		 		定时跳转到其他页面：
+		 			response.setHeader("refresh", "5;/webDemo/ad.html")
+		案例-content-Type作用：告诉浏览器以什么格式解析发送的实体内容，以及编码格式
+				Content-Type: text/html; charset=GB2312
+				可以通过response.setContentType("text/html;charset=utf-8")推荐
+				或者：response.setHeader("Content-Type", "text/html; charset=utf-8");
+				例如：response.setContentType("image/jpg")
+					格式可以到tomcat目录下的conf目录里的web.xml的<mine-mapping>标签里去查找
+			
+			

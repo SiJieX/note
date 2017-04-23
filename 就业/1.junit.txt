@@ -1,0 +1,64 @@
+Junit单元测试框架：不用再主函数里调用方法
+	使用步骤：
+		1：导入jar包
+		2:在需要测试的方法上加上@Test
+			注意：导包时要导入import static org.junit.Assert.*;
+	使用规范：
+		1.一个类如果需要测试，那么该类就应该对应着一个测试类
+			测试类的命名规范：被测试类的类名+Test
+		2.一个被测试的方法一般对应着一个测试的方法，测试的方法的命名规范是
+			test+被测试的方法的方法名
+			在测试的代码里加断言：
+				Assert.assertSame(expected, actual);expected：预期结果 ；actual：实际结果
+				Assert.assertEquals(expected, actual);底层用的是Equals方法
+				Assert.assertNull(object);断言是不是空
+		使用技巧： 1.按照规范来测试太麻烦，因此在实际开发中可以，不用定义测试类，直接在需要测试的方法上加@Test,测试完毕后删除@Test
+				2.如果测试一个方法时，在junit窗口上显示绿条那么代表测试正确，如果为红条，测试出现了异常
+				3.如果点击方法名、类名、包名、工程名则是分别测试其下的所有加了注解的方法
+				4.测试的方法不能是静态的,也不能是带有形参的，因此在测试时可以单独写一个测试的方法，调用需要测试的方法，传入形参。
+				5.如果测试的一个方法的时候需要准备测试环境或者测试完后需要清理测试环境，可以使用@Before @After 测试多个方法时每测试一个方法就会执行一次
+					@BeforeClass @AfterClass 其方法必须是静态的，测试多个方法只执行一次
+内省：变态的反射
+	只要解决的问题是：把对象的属性封装到对象中
+	获取单个属性的步骤：
+		1.获取属性描述器的构造方法：PropertyDescriptor(String propertyName, Class<?> beanClass)：
+					propertyName属性的值 ，beanClass：对象的类名
+		2.通过属性描述器获取属性对应的get或者是set方法
+					Method getReadMethod()：获取属性的get方法
+					Method getWriteMethod() ：获取属性的set方法  	
+		3,通过第二步返回的Method调用 Object invoke(Object obj, Object... args)方发设置属性值 
+ 					obj：需要设置属性的对象 args：属性的值
+ 	获取多个属性的步骤：
+ 		1.通过内省类：Introspector的static BeanInfo getBeanInfo(Class<?> beanClass, int flags)方法获得BeanInfo对象
+ 		2.通过 BeanInfo对象获取所有的属性描述器
+ 			PropertyDescriptor[] getPropertyDescriptors()
+ BeanUtils:内省的工具类
+ 	使用步骤：
+ 		1.导包：  由于BeanUtils依赖其他包，因此需要导入两个包commons-logging和commons-beanutils-1.8.0
+ 		2.创建需要内省的对象
+ 		3.调用BeanUtils的静态方法BeanUtils.setProperty(bean, name, value):
+ 			bean:需要内省的对象
+ 			name:需要内省的对象的属性名
+			value：需要设置的值	
+	ConvertUtils.register(converter, clazz):当属性不是字符串时需要注册转化器
+			converter：转换器接口，需要实现public Object convert(Class type, Object value)方法：
+					value:需要转化的值		
+			clazz:转换后的类型的字节码对象（内省对象需要转化的类型的字节码对象）	
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				

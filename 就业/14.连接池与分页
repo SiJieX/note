@@ -1,0 +1,120 @@
+连接池
+	1.连接资源宝贵；需要对连接管理
+	2.连接：
+		a)操作数据库，创建连接
+		b)操作结束，  关闭！
+	分析：
+		涉及频繁的连接的打开、关闭，影响程序的运行效率！
+	连接管理：
+		预先创建一组连接，用的时候每次取出一个； 用完后，放回；
+自定义连接池：
+	实现步骤：
+		1.MyPool.java  连接池类，   
+		2.指定全局参数：  初始化数目、最大连接数、当前连接、 连接池集合
+		3.构造函数：循环创建3个连接
+		4.写一个创建连接的方法
+		5.获取连接
+			判断：池中有连接，直接拿
+	 			 池中没有连接，
+					判断，是否达到最大连接数；
+						 达到，抛出异常；
+						 没有达到最大连接数，创建新的连接
+		6. 释放连接
+	 		连接放回集合中（可以使用动态代理连接的close()方法）
+			动态代理：
+				如果对某个接口中的某个指定的方法的功能进行扩展，而不想实现接口里所有方法，可以使用(动态)代理模式!
+				Java中代理模式：静态/动态/Cglib代理(spring)
+				使用动态代理，可以监测接口中方法的执行！
+				对Connection对象，生成一个代理对象：
+				|--Proxy
+					static Object newProxyInstance(
+					ClassLoader loader,    当前使用的类加载器
+					Class<?>[] interfaces,   目标对象(Connection)实现的接口类型（当没有实现接口时，传入自身的字节码对象）
+					InvocationHandler h    事件处理器：当执行上面接口中的方法的时候，就会自动触发事件处理器代码，把当前执行的方法(method)作为参数传入。
+				) 
+开源的连接池技术：
+	Sun公司约定： 如果是连接池技术，需要实现一个接口：javax.sql.DataSource;
+	1DBCP连接池：
+		DBCP 是 Apache 软件基金组织下的开源连接池实现，使用DBCP数据源，应用程序应在系统中增加如下两个 jar 文件：
+			•Commons-dbcp.jar：连接池的实现
+			•Commons-pool.jar：连接池实现的依赖库
+		Tomcat 的连接池正是采用该连接池来实现的。该数据库连接池既可以与应用服务器整合使用，也可由应用程序独立使用。
+	核心类：BasicDataSource 
+	使用步骤：
+		1.硬编码方式
+			1.引入jar文件
+				commons-dbcp-1.4.jar
+				commons-pool-1.5.6.jar
+			2.创建核心类BasicDataSource
+				BasicDataSource dataSouce = new BasicDataSource()
+			3.连接池参数配置：
+				dataSouce.setUrl("jdbc:mysql:///jdbc_demo")：数据库连接字符串
+				dataSouce.setDriverClassName("com.mysql.jdbc.Driver")： 数据库驱动
+				dataSouce.setUsername("root")：数据库连接用户
+				dataSouce.setPassword("root")：数据库连接密码
+				dataSouce.setInitialSize(3)：初始化连接数量
+				dataSouce.setMaxActive(6)：最大连接数量
+				dataSouce.setMaxIdle(3000)：最大空闲时间
+			4.获取连接：
+				Connection con = dataSouce.getConnection()
+			5.关闭连接：
+				con.colse()
+		2.通过配置参数
+			1.引入jar文件
+				commons-dbcp-1.4.jar
+				commons-pool-1.5.6.jar
+			2.准备配置文件（properties）：
+				参数的键位setXxx()方法中将首字母换成小写
+			3.通过工厂类获得BataSouce对象
+				DataSource dataSouce = BasicDataSourceFactory.createDataSource(prop);
+			4.获取连接：
+				Connection con = dataSouce.getConnection()
+			5.关闭连接：
+				con.colse()
+C3P0连接池：
+	最常用的连接池技术！Spring框架，默认支持C3P0连接池技术！
+	C3P0连接池，核心类：
+		CombopooledDataSource ds;
+	使用步骤：
+		1.硬编码方式：
+			1.下载，引入jar文件:  c3p0-0.9.1.2.jar
+			2. 创建连接池核心工具类
+				ComboPooledDataSource dataSource = new ComboPooledDataSource();
+			3.设置连接参数：
+				dataSource.setJdbcUrl("jdbc:mysql://localhost:3306/jdbc_demo")：url
+				dataSource.setDriverClass("com.mysql.jdbc.Driver")：驱动
+				dataSource.setUser("root")：用户名
+				dataSource.setPassword("root")：用户密码
+				dataSource.setInitialPoolSize(3)：初始连接数
+				dataSource.setMaxPoolSize(6)：最大连接数
+				dataSource.setMaxIdleTime(1000)：空闲时间
+			4.获取连接对象：
+				Connection con = dataSource.getConnection();
+			5.关闭连接对象
+				con.close();
+		2.配置文件方式：
+			1.下载，引入jar文件:  c3p0-0.9.1.2.jar
+			2. 创建c3p0连接池核心工具类
+				ComboPooledDataSource dataSource = new ComboPooledDataSource(参数);
+					会自动加载src下c3p0的配置文件【c3p0-config.xml】
+					如果不写参数会使用名为default-config节点下的配置，也可以指定为需要的节点下的配置
+			3.配置c3p0-config.xml文件
+			4.获取连接对象：
+				Connection con = dataSource.getConnection();
+			5.关闭连接对象
+				con.close()：
+分页技术
+	分页技术：
+		JSP页面，用来显示数据！ 如果数据有1000条，分页显示，每页显示10条，共100页;   好处:  利于页面布局，且显示的效率高！
+	分页关键点：
+		1.分页SQL语句；
+		2.PageBean
+			包含的属性：
+				当前页
+				每页显示行数
+				总页数
+				list集合（存放每行显示数据的javabean）
+		3.后台处理： dao/service/servlet/JSP
+		
+
+

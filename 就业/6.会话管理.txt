@@ -1,0 +1,123 @@
+会话管理：管理浏览器客户端 和 服务器端之间会话过程中产生的会话数据。
+	软件中的一次会话： 打开浏览器 -> 访问一些服务器内容 -> 关闭浏览器
+	使用域对象存在的问题： 实现资源之间的数据共享
+		request域对象：一定要使用转发技术来跳转页面，跳转的太多
+		context域对象：context是所有用户公有的资源会覆盖数据。
+		解决办法： 可以使用session域对象来保存会话数据
+会话技术：
+	Cookie技术：会话数据保存在浏览器客户端。
+	Session技术：会话数据保存在服务器端。
+Cooke技术：会话数据保存在浏览器客户端。
+	使用步骤：
+		1.构造Cookie对象
+			构造方法：
+			Cookie(java.lang.String name, java.lang.String value)
+		 	Cookie cookie1 = new Cookie("name","eric")
+		2.设置cookie
+			void setPath(java.lang.String uri)  ：设置cookie的有效访问路径 。默认情况：有效路径在当前web应用根目录
+			void setMaxAge(int expiry) ： 设置cookie的有效时间（从最后一次访问开始计算时间）
+                                       正整数：表示cookie数据保存浏览器的缓存目录（硬盘中），数值表示以秒计时保存的时间
+			         负整数：表示cookie数据保存浏览器的内存中，浏览器关闭cookie就丢失了(默认)
+			         零：表示删除同名的cookie数据
+			void setValue(java.lang.String newValue) ：设置cookie的值
+		3.发送cookie到浏览器端保存
+			void response.addCookie(Cookie cookie)  : 发送cookie
+		4.服务器接收cookie
+			Cookie[] request.getCookies() : 接收cookie
+	Cookie原理:
+		1.服务器创建cookie对象，把会话数据存储到cookie对象中。
+			new Cookie("name","value");
+		2.服务器发送cookie信息到浏览器(通过响应头的Set-Cookie)
+			response.addCookie(cookie);
+			举例： set-cookie: name=eric  (隐藏发送了一个set-cookie名称的响应头)
+		3.浏览器得到服务器发送的cookie，然后保存在浏览器端。
+		4.浏览器在下次访问服务器时，会带着cookie信息
+			举例： cookie: name=eric  (隐藏带着一个叫cookie名称的请求头)
+		5.服务器接收到浏览器带来的cookie信息
+			request.getCookies();
+	Cookie的细节:
+		1.void setPath(java.lang.String uri)：
+			设置cookie的有效访问路径。有效路径指的是cookie的有效	路径保存在哪里，
+			那么浏览器在有效路径下访问服务器时就会带着cookie信息，否则不带cookie信息。
+		2.void setMaxAge(int expiry) ： 设置cookie的有效时间。
+			正整数：表示cookie数据保存浏览器的缓存目录（硬盘中），数值表示保存的时间。
+			负整数：表示cookie数据保存浏览器的内存中。浏览器关闭cookie就丢失了(默认)
+			零：表示删除同名的cookie数据
+	    3.Cookie数据类型只能保存非中文字符串类型的。可以保存多个cookie，但是浏览器一般只允许存放300个Cookie，
+	              每个站点最多存放20个Cookie，每个Cookie的大小限制为4KB
+Session技术
+	Cookie的局限：
+		1.Cookie只能存字符串类型。不能保存对象
+		2.只能存非中文。
+		3.1个Cookie的容量不超过4KB。
+			如果要保存非字符串，超过4kb内容，只能使用session技术！！！
+	Session特点：
+		会话数据保存在服务器端。（内存中）
+	Session技术核心
+		HttpSession类：用于保存会话数据
+		1.创建或得到session对象
+			HttpSession session = request.getSession(); 
+			HttpSession session = request.getSession(false); ,当参数为false时，如果不存在session对象，不会创建session
+		2.设置session对象
+			void setMaxInactiveInterval(int interval)： 设置session的有效时间
+			void invalidate()： 销毁session对象
+			java.lang.String getId()： 得到session编号
+		3.保存会话数据到session对象
+			void setAttribute(java.lang.String name, java.lang.Object value)：保存数据
+			java.lang.Object getAttribute(java.lang.String name)：获取数据
+			void removeAttribute(java.lang.String name)： 清除指定的数据	
+	Session原理
+	   前提： 在哪个session域对象保存数据，就必须从哪个域对象取出
+		浏览器1：(给s1分配一个唯一的标记：s001,把s001发送给浏览器)
+			1）创建session对象，保存会话数据
+					HttpSession session = request.getSession();   --保存会话数据 s1
+		浏览器1的新窗口（带着s001的标记到服务器查询，s001->s1,返回s1）	
+			1）得到session对象的会话数据
+					HttpSession session = request.getSession();   --可以取出  s1
+		新的浏览器1：(没有带s001,不能返回s1)
+			1）得到session对象的会话数据
+					HttpSession session = request.getSession();   --不可以取出  s2
+		浏览器2：(没有带s001,不能返回s1)
+			1）得到session对象的会话数据
+					HttpSession session = request.getSession();  --不可以取出  s3
+		代码解读：HttpSession session = request.getSession();
+			1）第一次访问创建session对象，给session对象分配一个唯一的ID，叫JSESSIONID
+					new HttpSession();
+			2）把JSESSIONID作为Cookie的值发送给浏览器保存
+					Cookie cookie = new Cookie("JSESSIONID", sessionID);
+					response.addCookie(cookie);
+			3）第二次访问的时候，浏览器带着JSESSIONID的cookie访问服务器
+			4）服务器得到JSESSIONID，在服务器的内存中搜索是否存放对应编号的session对象。 
+				if(找到){
+						return map.get(sessionID);
+					}
+					Map<String,HttpSession>]
+					<"s001", s1>
+					<"s001,"s2> 
+			5）如果找到对应编号的session对象，直接返回该对象
+			6）如果找不到对应编号的session对象，创建新的session对象，继续走1的流程  
+				结论：通过JSESSION的cookie值在服务器找session对象 
+		Sesson细节
+			1）java.lang.String getId()  ： 得到session编号
+			2）两个getSession方法的区别：
+				request.getSession(true) / getSession() : 创建或得到session对象。没有匹配的session编号，自动创建新的session对象。
+				request.getSession(false): 得到session对象,没有匹配的session对象的编号，返回null
+			3）void setMaxInactiveInterval(int interval) ： 设置session的有效时间(以分为单位)
+				session对象销毁时间：
+					3.1 默认情况30分服务器自动回收
+					3.2 修改session回收时间
+					3.3 全局修改session有效时间
+						Web.xml						
+						<!-- 修改session全局有效时间:分钟 -->
+						<session-config>
+							<session-timeout>1</session-timeout>
+						</session-config>
+					3.4.手动销毁session对象
+						void invalidate()：销毁session对象   
+			4）如何避免浏览器的JSESSIONID的cookie随着浏览器关闭而丢失的问题
+				手动发送一个硬盘保存的cookie给浏览器
+					Cookie c = new Cookie("JSESSIONID",session.getId());
+					c.setMaxAge(60*60);
+					response.addCookie(c);
+	
+	

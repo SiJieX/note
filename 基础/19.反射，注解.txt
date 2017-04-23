@@ -1,0 +1,135 @@
+反射技术：
+	其实就是动态加载一个指定的类，并获取该类中的所有的内容。而且将字节码文件封装成对象，
+	并将字节码文件中的内容都封装成对象，这样便于操作这些成员。
+	简单说：反射技术可以对一个类进行解剖。
+反射的好处：
+	大大的增强了程序的扩展性。（tomact,和一些框架就是使用了反射技术，可以通过配置文件创建对象）
+Class<T>:
+	没有构造方法：
+	一般方法：
+		static Class<?> forName(String className) ：通过类名的字符串形式获得该类的字节码对象
+		T newInstance() ： 创建此 Class 对象所表示的类的一个新实例
+			注意：会抛出异常
+				1.当没有空参数的构造函数时会抛出InstantiationException（初始化异常）
+				2.当构造方法私有化后会抛出IllegalAccessException（无效访问异常）
+		Constructor<T> getConstructor(Class<?>... parameterTypes) ：返回该类有参数的公共构造方法对象
+		Constructor<T> getDeclaredConstructor(Class<?>... parameterTypes): 返回该类有参数的构造方法对象(包括私有的)
+			只要包含Declared都能获得私有的
+		Constructor<?>[] getConstructors() ：返回该类的所有共有构造方法对象
+		Constructor<?>[] getDeclaredConstructors() 返回该类的所有构造方法对象（包括私有的）
+		Type getGenericSuperclass(): 返回表示此 Class 所表示的实体（类、接口、基本类型或 void）的直接超类的 Type。  
+		Annotation[] getAnnotations()：返回此元素上存在的所有注释。  
+获取这个Class对象的四种方式：
+	1：通过每个对象都具备的方法getClass来获取。
+			弊端：必须要创建该类对象，才可以调用getClass方法。
+	2：每一个数据类型(基本数据类型和引用数据类型)都有一个静态的属性class。
+			弊端：必须要先明确该类。
+	 	前两种方式不利于程序的扩展，因为都需要在程序使用具体的类来完成。
+	3：使用的Class类中的方法，静态的forName方法
+	 	指定什么类名，就获取什么类字节码文件对象，这种方式的扩展性最强，只要将类名的字符串传入即可
+	 	注意：类名必须为src作为根目录的类的全名
+	4：获得Class字节码文件后，通过Class字节码文件或的构造方法对象，再同过构造器创建对象
+		Constructor<?> cos = Class.forName(ClassName).getConstructor(String.class,int.class);
+		Person p4 = (Person)cos.newInstance("小明",30);//通过构造器对象创建对象
+注解
+	注解与注释，
+		注解，告诉编译器如何运行程序！
+		注释， 给程序员阅读，对编译、运行没有影响；
+注解作用
+	1. 告诉编译器如何运行程序；
+	2. 简化(取代)配置文件
+常用的注解：
+	@Override： 重写父类的方法
+	@SuppressWarnings({"unused","unchecked"})： 抑制编译器警告
+	@Deprecated： 标记方法以及过时
+自定义注解
+	通过自定义注解，可以给类、字段、方法上添加描述信息！
+	基本注解：
+		public @interface Author {
+			String name();
+			int age();
+		}
+		 注意：1.修饰为默认或public
+			 2.不能有主体
+		使用：@Author(name = "Jet", age = 30)
+	带默认值的注解：
+		public @interface Author {
+			String name();
+			int age() default 30;  // 带默认值的注解;  使用的时候就可以不写此属性值
+ 		}
+ 		使用：@Author(name = "Jet")
+ 	默认名称的注解
+ 		public @interface Author {
+			String value();
+		}
+		注意：如果注解名称为value,使用时候可以省略名称，直接给值，且注解只有一个属性时候才可以省略名称
+		使用：@Author("Jet")或@Author(value = "Jet")
+	注解属性类型为数组：
+		public @interface Author {
+			String[] value() default {"test1","test2"};
+		}
+		使用：@Author（{“”，“”}）
+	元注解：表示定义注解时使用的注解！
+		1.指定注解的可用范围：	
+			@Target({
+				TYPE,     		类
+				FIELD,    		字段
+				METHOD,  		方法
+				PARAMETER,   	参数
+				CONSTRUCTOR, 	构造器
+				LOCAL_VARIABLE  局部变量
+			})
+		2. 指定注解的声明周期
+				@Retention(RetentionPolicy.SOURCE)     注解只在源码级别有效
+				@Retention(RetentionPolicy.CLASS)      注解在字节码即别有效  默认值
+				@Retention(RetentionPolicy.RUNTIME)    注解在运行时期有效
+			注意：如果运行时需要注解的信息必须要设置为运行时期有效
+注解，优化BaseDao的代码
+	当表名与数据库名称不一致、 字段与属性不一样、主键不叫id， 上面的BaseDao不能用！
+	这时，可以通过配置文件(XML) 解决！
+注解和xml的优缺点：
+	注解：
+		简化XML配置， 程序处理非常方便！
+		(不便于维护： 例如修改字段名，要重新编译！)
+	XML
+		便于维护！  需要些读取代码！
+Log4J日志组件
+	程序中为什么用日志组件？
+		简单来说，为了项目后期部署上线后的维护、错误排查！
+		Log4j,  log for java, 开源的日志组件！
+	使用步骤：
+		1. 下载组件，引入jar文件;
+			log4j-1.2.11.jar
+			和commons-logging-1.1.3.jar
+		2. 配置 :  src/log4j.properties
+			# 通过根元素指定日志输出的级别、目的地： 
+			#  日志输出优先级： debug < info < warn < error 
+			log4j.rootLogger=info,console,file
+			
+			############# 日志输出到控制台 #############
+			# 日志输出到控制台使用的api类
+			log4j.appender.console=org.apache.log4j.ConsoleAppender
+			# 指定日志输出的格式： 灵活的格式
+			log4j.appender.console.layout=org.apache.log4j.PatternLayout
+			# 具体格式内容
+			log4j.appender.console.layout.ConversionPattern=%d %p %c.%M()-%m%n
+			
+			
+			############# 日志输出到文件 #############
+			log4j.appender.file=org.apache.log4j.RollingFileAppender
+			# 文件参数： 指定日志文件路径
+			log4j.appender.file.File=../logs/MyLog.log
+			# 文件参数： 指定日志文件最大大小
+			log4j.appender.file.MaxFileSize=5kb
+			# 文件参数： 指定产生日志文件的最大数目
+			log4j.appender.file.MaxBackupIndex=100
+			# 日志格式
+			log4j.appender.file.layout=org.apache.log4j.PatternLayout
+			log4j.appender.file.layout.ConversionPattern=%d %c.%M()-%m%n
+		3. 使用
+			创建log对象
+				Log log = LogFactory.getLog(IndexServlet.class);
+			设置log信息
+				log.debug/info/warn/error(输出信息, Throwable对象（可选，如果传入参数，会打印错误的堆栈信息）);
+				
+	

@@ -1,0 +1,178 @@
+网络编程：
+IP:
+	网络中设备的标识，本地回环地址为127.0.0.1；主机名：localhost
+	每台电脑都有一个IP，ipv4不够用，后来又出了ipv6
+端口：
+	物理端口：实际的插座
+	逻辑端口：用于标识进程的逻辑地址，不同进程的标识；有效端口：0~65535，其中0~1024系统使用或保留端口（不建议使用）
+	每个进程都会分配一个端口，因为数据通过ip放松的电脑，但是电脑有许多进程，但是具体发送到哪个进程不知道，因此每个进程需要一个端口来标识
+UDP协议：
+	将数据及源封装成数据包中，不需要建立连接
+	每个数据包的大小限制在64kb内，超过后可以分多个包来发送
+	因不需要建立连接，是不可靠协议，因此速度快
+TCP协议：
+	建立连接，形成传输数据的通道；可以进行大数据量传输
+	通过3次握手完成连接，是可靠协议
+	必须建立连接，效率相对稍低
+注意：
+	1，只要是网络传输，必须有socket 。
+	2，数据一定要封装到数据包中，数据包中包括目的地址、端口、数据等信息。
+域名解析：
+	因为数字类型的ip不好记忆，因此用域名来表示ip,用域名访问网站时，首先会去访问本地的ip,在去访问解析服务器的ip地址去解析(DNS)，然后再访问相应的ip
+		C:\Windows\System32\drivers\etc下的hosts文件存放着本地ip
+java 中ip对象：InetAddress（无构造方法）
+	通过其静态方法获得对象：
+		static InetAddress getLocalHost() ：返回本地主机PC-201702161857/192.168.2.104
+		static InetAddress getByName(String host ):在给定主机名的情况下确定主机的 IP 地址,可以传入"www.baidu.com"得到www.baidu.com/61.135.169.121
+			传入localhost返回127.0.0.1
+	一般方法：
+		String getHostName() 获取此 IP 地址的主机名。
+Socket：套接字，通信的端点。
+	就是为网络服务提供的一种机制，通信的两端都有Socket，网络通信其实就是Socket间的通信，数据在两个Socket间通过IO传输。
+UDP协议：
+	发送和接收用的是同一个对象：DatagramSocket
+DatagramSocket 
+	UDP封装的socket对象，封装了udp传输协议的socket对象。
+	构造方法 ：
+		  DatagramSocket()：
+		  DatagramSocket(int port)
+		  DatagramSocket(int port, InetAddress laddr)
+	方法：
+		  void close()：关流 
+		  void receive(DatagramPacket p) 
+		  void send(DatagramPacket p) 
+DatagramPacket：
+ 	构造方法：
+ 		DatagramPacket(byte[] buf, int length, InetAddress address, int port)
+TCP客户端创建过程：
+	1，使用Socket建立tcp的socket服务
+		最好明确具体的地址和端口。这个对象在创建时，就已经可以对指定ip和端口进行连接(三次握手)。
+	2，如果连接成功，就意味着通道建立了，socket流就已经产生了。
+		该通道就是Socket流，是底层建立好的
+		只要获取到socket流中的读取流和写入流即可，只要通过getInputStream和getOutputStream就可以获取两个流对象。
+	3，关闭资源。
+TCP服务端创建步骤：
+	1，创建服务端socket服务，并监听一个端口。
+	2，服务端为了给客户端提供服务，获取客户端的内容，可以通过accept方法获取连接过来的客户端对象。
+	3，可以通过获取到的socket对象中的socket流和具体的客户端进行通讯。
+	4，如果通讯结束，关闭资源。注意：要先关客户端，再关服务端。
+		访问完必须端口连接，好让其他客户端访问。因此需要服务端断开客户端，因为客户端断开连接不可控
+客户端Socket对象：
+Socket：
+	构造方法：
+		Socket(InetAddress address, int port)：
+	方法：
+		void close() ：该流关闭后，Socket里的流也会关闭，因此可以不关闭InputStream，OutputStream流
+		InputStream getInputStream() ：
+		OutputStream getOutputStream() ：
+		InetAddress getInetAddress() ：
+		int getLocalPort() ：本地端口
+		int getPort()  ：返回远程端口
+		void shutdownInput() ：告诉服务端以读完
+		void shutdownOutput() ：告诉服务端以写完
+服务端Socket对象：
+	ServerSocket：
+		构造方法：
+			ServerSocket(int port) 
+			Socket accept() ：获得客户端Socket对象
+			void close() ：关流（必须先关闭客户端的流，在关闭服务端流）
+			InetAddress getInetAddress()： 
+最常见的客户端：
+	浏览器 ：IE
+最常见的服务端：
+	服务器：Tomcat
+原理：
+	1自定义服务端，
+		使用已有的客户端IE，了解一下客户端给服务端发了什么请求？
+			发送的请求是：
+				请求行 ：
+					GET（请求方式） / HTTP/1.1 （ http协议版本）  /myweb/1.html （请求的资源路径 ） 
+				请求消息头 ：
+					格式：
+						属性名：属性值
+							Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, 
+							application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*
+							Accept: */*     
+							Accept-Language: zh-cn,zu;q=0.5
+							Accept-Encoding: gzip, deflate
+							User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; InfoPath.2)
+							Host: 192.168.1.100:9090
+							Host: www.huyouni.com:9090
+							Connection: Keep-Alive
+				空行
+				请求体。
+	2服务端发回应答消息。
+		应答行：
+			HTTP/1.1（http的协议版本） 200（应答状态码 ） OK（应答状态描述信息）
+		应答消息属性信息：
+			格式： 属性名：属性值
+				Server: Apache-Coyote/1.1
+				ETag: W/"199-1323480176984"
+				Last-Modified: Sat, 10 Dec 2011 01:22:56 GMT(缓存技术会用到此信息)
+				Content-Type: text/html
+				Content-Length: 199
+				Date: Fri, 11 May 2012 07:51:39 GMT
+				Connection: close
+		空行
+		应答体
+				<html>
+					<head>
+						<title>这是我的网页</title>
+					</head>
+					<body>
+						<h1>欢迎光临</h1>
+						<font size='5' color="red">这是一个tomcat服务器中的资源。是一个html网页。</font>
+					</body>
+				</html>
+URI
+	统一资源标识符 
+URL
+	统一资源定位符 
+URL类：
+	构造方法：
+		URL(String spec) ：
+		URL(String protocol, String host, int port, String file)
+			如果URL格式错误会抛出此异常：MalformedURLException
+	方法：
+		String getFile() 获取此 URL 的文件名。 
+ 		String getHost() 获取此 URL 的主机名（如果适用）。 
+ 		String getPath()  获取此 URL 的路径部分。 
+ 		int getPort()  获取此 URL 的端口号。 
+ 		String getProtocol() 获取此 URL 的协议名称。 
+ 		String getQuery() 获取此 URL 的查询部分。
+ 		URLConnection openConnection()获取此URL的URLConnection对象   
+ 		InputStream openStream() 打开到此 URL 的连接并返回一个用于从该连接读入的 InputStream
+ 			 实际是通过URLConnection 的openConnection().getInputStream()方法获得流对象
+抽象类URLConnection：
+	java中内置的可以解析的具体协议的对象+Socket
+	 子类HttpURLConnection
+	 构造方法：
+	 	protected  URLConnection(URL url) 
+	 方法：
+	 	  String getHeaderField(String name)通过名字获得应答消息的值 
+	 	  OutputStream getOutputStream()：获得输出流对象（实际是通过Socekt获得的）
+
+常见的网络结构，
+	1,C/S  client/server
+		特点：
+			该结构的软件，客户端和服务端都需要编写。
+			可发成本较高，维护较为麻烦。
+		好处：
+			客户端在本地可以分担一部分运算。
+	2,B/S  browser/server
+		特点：
+			该结构的软件，只开发服务器端，不开发客户端，因为客户端直接由浏览器取代。 
+			开发成本相对低，维护更为简单。
+		缺点：所有运算都要在服务端完成。
+		 	    
+ 
+  
+		 
+		
+	
+			
+ 
+
+		  
+		  
+		  

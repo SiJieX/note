@@ -1,0 +1,127 @@
+基于mvc模式的应用框架之struts
+	Struts就是基于mvc模式的框架！
+		(struts其实也是servlet封装，提高开发效率！)
+Struts2框架
+	Struts1是最早的一种基于mvc模式的框架；
+	Struts2 是在Struts1的基础上，融合了xwork的功能;
+		也可以说，Struts2 = struts1  +  xwork
+Struts2框架预先实现了一些功能：
+	1. 请求数据自动封装
+	2. 文件上传的功能
+	3. 对国际化功能的简化
+	4. 数据效验功能
+	……………….
+Struts开发步骤：
+	1. web项目，引入struts - jar包
+		核心jar包：
+			commons-fileupload-1.2.2.jar	  【文件上传相关包】
+			commons-io-2.0.1.jar
+			struts2-core-2.3.4.1.jar         【struts2核心功能包】
+				struts2-core-2.3.4.1.jar
+					StrutsPrepareAndExecuteFilter类： 即为核心过滤器
+				注意：使用的struts的版本不同，核心过滤器类是不一样的！
+			xwork-core-2.3.4.1.jar           【Xwork核心包】
+			ognl-3.0.5.jar					  【Ognl表达式功能支持表】
+			commons-lang3-3.1.jar            【struts对java.lang包的扩展】
+			freemarker-2.3.19.jar            【struts的标签模板库jar文件】
+			javassist-3.11.0.GA.jar          【struts对字节码的处理相关jar】
+	2. web.xml中，引入struts的核心功能
+		配置过滤器
+		Tomcat启动--> 加载自身web.xml-->加载所有项目的web.xml
+			通过在项目的web.xml中引入过滤器，--Struts的核心功能的初始化，通过过滤器完成
+		 filter 【
+			init/      	启动执行
+			doFilter/   访问执行
+			destroy
+			】
+		<filter>
+			<filter-name>struts2</filter-name>
+			<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+		</filter>
+		<filter-mapping>
+			<filter-name>struts2</filter-name>
+			<url-pattern>/*</url-pattern>
+		</filter-mapping>
+		
+	3. 开发action
+		开发Action
+			1. action类，也叫做动作类，一般继承ActionSupport类
+	   			 即处理请求的类  (struts中的action类取代之前的servlet)
+			2. action中的业务方法，处理具体的请求
+				注意：必须返回String
+				 	 方法不能有参数
+			3.实现原理：
+				是在servlet的doGet以及doPost方法中通过读取配置文件和反射技术调用action里面的方法
+	4. 配置action(配置struts.xml)
+		src/struts.xml
+			<package name="default" extends="struts-default">
+	    		<!-- action中的name为浏览器访问的路径 -->
+	        	<action name="index" class="struts2Demo.FirstAction">
+	        		<!-- result中的name为action中方法的返回值 -->
+	            	<result name="index">index.jsp</result>
+	        	</action>
+    		</package>
+    	注意： 1.必须放入src的根目录下
+    		 2.result节点的type属性定义了跳转的结果类型默认为转发
+    		 	 跳转的结果类型：
+					dispatcher     	转发，不指定默认为转发
+					redirect       	重定向
+					redirectAction  重定向到action资源
+					stream        	文件下载的时候用
+Struts2执行流程:
+	服务器启动：
+		1. 加载项目web.xml
+		2. 创建Struts核心过滤器对象， 执行filter中的init方法（会加载如下的xml文件）
+			struts-default.xml    核心功能的初始化
+			struts-plugin.xml     struts相关插件
+			struts.xml			    用户编写的配置文件
+	访问：
+		3. 用户访问Action, 服务器根据访问路径名称（配置action中的name属性），找对应的aciton配置, 创建action对象
+		4. 执行默认拦截器栈中定义的18个拦截器
+		5. 执行action的业务处理方法(再次访问时重新创建action对象)
+			由于每次访问都会创建action对象，因此不会存在线程安全问题
+struts-default.xml 详解
+ 	目录：struts2-core-2.3.4.1.jar/ struts-default.xml
+	 内容：
+		1. bean节点指定struts在运行的时候创建的对象类型
+		2. <package name="struts-default" abstract="true">节点  
+			用户写的package(struts.xml)一样要继承此包 
+			
+			a.<result-types>节点定义了跳转的结果类型
+				常用的有：
+					dispatcher    	转发，不指定默认为转发
+					redirect       	重定向
+					redirectAction  重定向到action资源
+					stream        	文件下载的时候用
+			b. <interceptors>节点定义了所有的拦截器
+				 1.<interceptor>节点定义了32个拦截器
+				 2.<interceptor-stack>节点定义了要引用的拦截器
+				  	为了拦截器引用方便，通过定义栈的方式引用拦截器，此时如果引用了栈，栈中的拦截器都会被引用!
+				  	并且按照引用的顺序执行
+				 3.<interceptor-stack name="defaultStack">
+					默认的拦截器栈，其中定义默认要执行的18个拦截器！
+			c. <default-interceptor-ref name="defaultStack"/>默认执行的拦截器栈
+			d.<default-class-ref class="com.opensymphony.xwork2.ActionSupport"/>默认执行的action
+拦截器：
+	拦截器功能与过滤器功能类似。
+	共同点： 都拦截资源！
+	区别：
+		过滤器:可以拦截所有资源；  (/index.jsp/servlet/img/css/js)
+		拦截器:只拦截action请求。
+		拦截器:struts的概念，只能在struts中用。
+		过滤器:servlet的概念，可以在struts项目、servlet项目用。
+面试题： 拦截器什么时候执行？ (访问/启动)  先执行action类创建，先执行拦截器？
+	1. 用户访问时候按顺序执行18个拦截器；
+	2. 先执行Action类的创建，再执行拦截器； 最后拦截器执行完，再执行业务方法
+共性问题
+	问题1：Struts.xml配置文件没有提示
+	解决a：
+		找到struts-2.0.dtd文件,  拷贝到某个目录：d:/dtd /..  (不要用中文目录)
+		让MyEclipse关联到上面dtd文件，
+		 	windows preferences - 搜索xml catalog
+		配置：
+			Location:    上面配置的dtd目录
+			Key:     -//Apache Software Foundation//DTD Struts Configuration 2.0//EN
+	解决b:
+		让机器连接互联网，工具会自动下载dtd文件，缓存到MyEclipse中！
+			

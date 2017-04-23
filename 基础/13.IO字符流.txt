@@ -1,0 +1,117 @@
+IO流：
+	用于处理设备上数据（存储和读取数据）。
+流：
+	可以理解数据的流动，就是一个数据流。IO流最终要以对象来体现，对象都存在IO包中。
+流的分类：
+	1：输入流（读）和输出流（写）：以操作者为准。
+	2：因为处理的数据不同，分为字节流和字符流。
+		1.字节流：所以字节流一样可以处理字符数据
+				处理字节数据的流对象。设备上的数据无论是图片或者dvd，文字，它们都以二进制存储的。
+				二进制的最终都是以一个8位为数据单元进行体现，所以计算机中的最小数据单元就是字节。
+				意味着，字节流可以处理设备上的所有数据， 
+		2.字符流：只要操作字符数据，优先考虑使用字符流体系
+				因为字符每个国家都不一样，所以涉及到了字符编码问题，那么GBK编码的中文用unicode编码解析是有问题的，
+				所以需要获取中文字节数据的同时+ 指定的编码表才可以解析正确数据。
+				为了方便于文字的解析，所以将字节流和编码表封装成对象，这个对象就是字符流。
+流的体系因为功能不同，但是有共性内容，不断抽取，形成继承体系。
+该体系一共有四个基类，而且都是抽象类。
+	字节流：
+		InputStream 
+		OutputStream
+	字符流：
+		Reader 
+		Writer
+IO异常处理：
+	io一定要写finally
+		public static void main(String[] args) {
+		FileWriter fw = null;//流对象声明放外面
+		try {
+			fw = new FileWriter("demo.txt",true);
+			fw.write("abcde");
+		}
+		catch (IOException e ){
+			System.out.println(e.toString()+"....");
+		}
+		finally{
+			if(fw!=null)//判读不为空
+				try{
+					fw.close();//单独抛异常
+				}
+				catch (IOException e){
+					System.out.println("close:"+e.toString());
+				}
+		}
+}
+装饰设计模式：
+	对一组对象的功能增强时，就可以使有该模式进行问题的解决
+	IO中的缓冲流就使用了此技术
+		包装：写一个类(包装类)对被包装对象进行包装；
+			1、包装类和被包装对象要实现同样的接口；
+			2、包装类要持有一个被包装对象；
+			3、包装类在实现接口时，大部分方法是靠调用被包装对象来实现的，对于需要修改的方法我们自己实现；
+FileWriter:
+	构造方法：
+		FileWriter(String filename)throws IOException:传递一个文件的名称：文件名称为：盘符：\\文件夹\\文件名,如果文件存在会替换以前的文件
+			相对路径：以项目的根目录为基准。
+			绝对路径：盘符和文件夹前用"\\"或者"/"
+		FileWriter(String fileName, boolean append) :如果文件不存在就重新创建，当append为true时如果文件存在就在文件后面追加内容，当为false时如果文件存在会替换原有文件
+	成员方法：
+		public void write(String str) throws IOException ：写入字符串
+		void write(String str, int off, int len)  throws IOException:
+		void write(int c)  throws IOException :会自动转成char类型
+		void write(char[] cbuf, int off, int len) throws IOException:
+		void write(char[] cbuf) throws IOException :
+		void.flush()throws IOException：刷新缓冲区，将缓冲区中的数据刷到目的地文件中。
+		void.close()throws IOException：关闭流，其实关闭的就是java调用的系统底层资源。在关闭前，会先刷新该流。
+FileReader:
+	构造方法：
+		FileReader(String fileName)throws FileNotFoundException：
+	成员方法：
+		public int read()throws IOException：读取单个字符，注意：没调用一次就读取了一个字符。
+		public int read(char[] cbuf)throws IOException:每次读取一个数组长度的字符，返回实际读取的字符的个数，如果读取完所有数据，返回-1
+		public int read(char[] cbuf, int off, int len) throws IOException:读取字符数组中的一部分
+		public void close()throws IOException :关闭该流并释放与之关联的所有资源（其实关闭的就是FileReader流对象）
+			注意：读方法是一个阻塞式方法：没有数据就一直等待
+BufferedWriter:
+	将文本写入字符输出流，缓冲各个字符（原理就是先将字符放入字符数组里在一起写入） 
+		构造方法：
+			public BufferedWriter(Writer out)：
+		一般方法：
+			public void close()throws IOException ：关闭此流，但要先刷新它。（其实关闭的就是FileWriter流对象） 
+ 			public void flush()throws IOException ：刷新该流的缓冲。 （其实关闭的就是FileWriter流对象）
+ 			public void newLine()throws IOException： 写入一个行分隔符。 
+ 			public void write(char[] cbuf, int off, int len)throws IOException ：写入字符数组的某一部分。 
+ 			public void write(int c)throws IOException ：写入单个字符。 
+ 			public void write(String s, int off, int len) throws IOException ：写入字符串的某一部分。 
+		
+BufferedReader:
+	从字符输入流中读取文本，缓冲各个字符（原理就是先将字符放入字符数组里在一起写入） 
+		构造方法：
+			public BufferedReader(Reader in) 
+		一般方法：
+			public int read()throws IOException： 读取单个字符。
+			public int read(char[] cbuf, int off, int len)throws IOException:
+			public String readLine()throws IOException : 读取一个文本行。
+			public void close()throws IOException:关闭该流并释放与之关联的所有资源。
+LineNumberReader:
+	是高效缓冲字符流的子类：具有缓冲流的方法：（可以显示行号）
+		特殊方法：
+			 int getLineNumber()：获得当前行号。
+			 void setLineNumber(int lineNumber)：设置当前行号。	
+输出流写数据的步骤：
+	1.创建输出流对象
+		需要抛出或捕获io异常。
+	2.调用输出流对象的写数据的方法
+		调用Writer类中的write方法写入字符串。字符串并未直接写入到目的地中，而是写入到了流中，(其实是写入到内存缓冲区中)
+		必须调用flush()方法
+	3.释放资源
+		调用close()方法
+flush()方法和close()方法的区别：
+	flush():将缓冲区的数据刷到目的地中后，流可以使用。
+	close():将缓冲区的数据刷到目的地中后，流就关闭了，
+			该方法主要用于结束调用的底层资源。
+			这个动作一定做。     
+常见系统的换行：
+	windows:\r\n;
+	linux:\n;
+	max:\r;
